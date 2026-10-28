@@ -26,6 +26,11 @@ Jason 的雲端工作區（monorepo）。手機、平板或 Mac 開 Claude Code 
   - session 結束時，Stop hook 會檢查有沒有沒歸檔的大檔
 - 同一個檔案改版後再歸檔，會存成新版本，舊版保留
 
+## Skills
+
+- `.claude/skills/` 由 JT-Skills repo 自動同步，**不要直接修改**，下次同步會被覆蓋
+- 要新增或修改 skill，到 `linmiepii-2049/JT-Skills` 開 PR；目前各 skill 的版號見 `.claude/skills/.jt-skills.json`
+
 ## 記憶
 
 雲端 session 沒有本機的記憶庫，記憶改存在 repo 裡，進版控：

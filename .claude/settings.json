@@ -1,15 +1,4 @@
 {
-  "extraKnownMarketplaces": {
-    "jt-skills": {
-      "source": {
-        "source": "github",
-        "repo": "linmiepii-2049/JT-Skills"
-      }
-    }
-  },
-  "enabledPlugins": {
-    "skill-template@jt-skills": true
-  },
   "hooks": {
     "Stop": [
       {
