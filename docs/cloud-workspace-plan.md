@@ -21,7 +21,7 @@
 手機 / 平板
  └─ Claude App · claude.ai/code（雲端 session）
       ├─ 開 JT-Projects（monorepo，private）
-      │    └─ .claude/settings.json 自動安裝 JT-Skills marketplace 的 skills
+      │    └─ .claude/skills/ 由 JT-Skills 自動同步（雲端不安裝 marketplace plugin）
       ├─ 產出成品 → projects/<slug>/outputs/
       ├─ 大檔（影片 >20MB）→ session 內 `jt archive` 直傳 R2
       └─ git push → GitHub Actions → 小檔歸檔到 R2 + 中繼資料寫 D1
@@ -66,7 +66,8 @@ JT-Skills/
 JT-Projects/
 ├─ CLAUDE.md                 # 全域偏好（律伸、繁中…）+ 歸檔規則 + 記憶
 ├─ memory/                   # 取代本機 memory，feedback 規則入版控
-├─ .claude/settings.json     # extraKnownMarketplaces=JT-Skills、enabledPlugins、hooks
+├─ .claude/settings.json     # Stop hook
+├─ .claude/skills/           # JT-Skills 同步進來，版號見 .jt-skills.json
 ├─ projects/<yyyy-mm>-<slug>/
 │   ├─ project.json          # 名稱、標籤、狀態
 │   └─ outputs/              # ← 只有這裡的東西會歸檔
@@ -186,7 +187,7 @@ offload_jobs(id, artifact_ids JSON, status, error, created_at, finished_at)
 | ---- | -------------------------------------------------------------------------------------------- | --------------------------------------------- |
 | P1 ✅ | 建 D1 / R2、套 migration（2026-10-28 完成，D1 id `5d9e7ec0-…`，皆在 APAC）                                                                     | `wrangler d1 execute` 查得到表                |
 | P2 ✅ | JT-Skills 骨架（2026-10-28 完成）：marketplace、skill-template、腳本、CI                                   | 範本 plugin 能在本機與雲端安裝                |
-| P3 🟡 | （2026-10-28 程式完成，待設定 token 後驗證 Actions）JT-Projects repo + CLAUDE.md + jt CLI + archive workflow                                     | push 範例成品後 D1 有資料、R2 有檔            |
+| P3 ✅ | （2026-10-28 完成，本機與 Actions 歸檔都驗證過）JT-Projects repo + CLAUDE.md + jt CLI + archive workflow                                     | push 範例成品後 D1 有資料、R2 有檔            |
 | P4   | jteam-viewer + Access + 下載到裝置                                                           | 手機登入看得到範例成品                        |
 | P5   | 移到 Google Drive（Workflow + OAuth + R2 用量面板）                                          | 100MB 測試影片搬到 Drive、md5 相符、R2 已刪除 |
 | P6   | JT-Vault 遷移 + backup workflow                                                              | 手機 Obsidian 同步成功                        |
@@ -195,7 +196,7 @@ offload_jobs(id, artifact_ids JSON, status, error, created_at, finished_at)
 
 ## 10. 風險 / 待驗證
 
-- 雲端 session 能否從 private 的 JT-Skills 安裝 plugin：P2 先實測；不行就改用 git submodule 掛進 monorepo 的 `.claude/skills`
+- ~~雲端 session 能否從 private 的 JT-Skills 安裝 plugin~~ → 已確認不行：官方文件寫明雲端不安裝 repo 設定的 plugin。改由 JT-Skills 的 `sync` workflow 把 skill 複製進 JT-Projects `.claude/skills/`（2026-10-28）
 - Cloudflare 免費額度：R2 10GB，影片多時可能要付費（約 US$0.015/GB/月）
 - R2 沒有物件版本控制：靠「檔名帶 sha」保留舊版。整套系統**只有一條路徑會刪 R2**，就是 Drive md5 驗證通過之後
 - 搬走後 Drive 就是唯一的一份：之後如果你在 Drive 手動刪掉，就真的沒了。瀏覽頁點開時若發現 Drive 檔案不存在，會標示「遺失」
