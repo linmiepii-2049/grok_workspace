@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>雲端工作室</title>
+<style>
+:root{--bg:#f8fafc;--fg:#0f172a;--muted:#475569;--card:#fff;--line:#e2e8f0;--accent:#4f46e5}
+@media (prefers-color-scheme:dark){:root{--bg:#0b1020;--fg:#e2e8f0;--muted:#94a3b8;--card:#141b33;--line:#24304f;--accent:#818cf8}}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,"PingFang TC","Noto Sans TC",sans-serif;line-height:1.7}
+.wrap{max-width:960px;margin:0 auto;padding:56px 16px}
+.tag{color:var(--accent);font-weight:600;letter-spacing:.15em;font-size:.85rem}
+h1{font-size:clamp(2.2rem,6vw,3.6rem);margin:.3em 0 .2em;line-height:1.2}
+.lead{color:var(--muted);font-size:1.15rem;max-width:40em}
+h2{font-size:1.4rem;margin:56px 0 16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+.card h3{font-size:1.05rem;margin-bottom:6px}
+.card p{color:var(--muted);font-size:.95rem}
+ol.flow{padding-left:1.3em}
+ol.flow li{margin:.5em 0}
+code{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:.9em}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+td,th{border-bottom:1px solid var(--line);padding:10px 8px;text-align:left;vertical-align:top}
+th{color:var(--muted);font-weight:600}
+footer{margin-top:64px;color:var(--muted);font-size:.85rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="tag">JT-PROJECTS</div>
+  <h1>雲端工作室</h1>
+  <p class="lead">一個放在雲端的 monorepo 工作區。無論拿起手機、平板還是 Mac，打開 Claude Code 就能接著做；產出的成品會自動歸檔到 Cloudflare R2 / D1，換裝置也不會遺失。</p>
+
+  <h2>為什麼好用</h2>
+  <div class="grid">
+    <div class="card"><h3>📱 任何裝置都能開工</h3><p>工作環境在雲端容器裡，裝置只是入口。通勤用手機下指令，回家用 Mac 接手。</p></div>
+    <div class="card"><h3>🗂️ 成品自動歸檔</h3><p>放進 <code>outputs/</code> 的檔案推上 GitHub 後，由 Actions 自動歸檔到 R2，版本全保留。</p></div>
+    <div class="card"><h3>🧠 記憶跟著 repo 走</h3><p>偏好與規則寫在 <code>memory/</code>，進版控，每個 session 開工前先讀。</p></div>
+    <div class="card"><h3>🧩 共用 Skills</h3><p><code>.claude/skills/</code> 從 JT-Skills repo 自動同步，所有裝置用同一套技能。</p></div>
+  </div>
+
+  <h2>一個專案的流程</h2>
+  <ol class="flow">
+    <li>建立專案：<code>npm run jt -- new &lt;slug&gt; "名稱"</code>，產生 <code>projects/&lt;yyyy-mm&gt;-&lt;slug&gt;/</code></li>
+    <li>在專案資料夾裡寫草稿、原始碼</li>
+    <li>把成品放進 <code>outputs/</code>（圖片、影片、HTML、文案、簡報）</li>
+    <li>commit 並推到 <code>main</code>，小檔自動歸檔；影片用 <code>npm run jt -- archive</code> 直傳 R2</li>
+  </ol>
+
+  <h2>目錄一覽</h2>
+  <table>
+    <tr><th>路徑</th><th>用途</th></tr>
+    <tr><td><code>projects/</code></td><td>各專案與成品</td></tr>
+    <tr><td><code>memory/</code></td><td>跨 session 的記憶</td></tr>
+    <tr><td><code>tools/jt/</code></td><td>jt CLI（new / archive / check）</td></tr>
+    <tr><td><code>infra/</code></td><td>Cloudflare 設定、D1 migration</td></tr>
+    <tr><td><code>docs/</code></td><td>計畫與環境設定說明</td></tr>
+  </table>
+
+  <footer>P7 手機實測 · 2026-10</footer>
+</div>
+</body>
+</html>
