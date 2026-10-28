@@ -1,0 +1,29 @@
+name: deploy-viewer
+
+on:
+  push:
+    branches: [main]
+    paths: ["apps/viewer/**", ".github/workflows/deploy-viewer.yml"]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-viewer
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: 部署 jteam-viewer
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: npm run viewer:deploy

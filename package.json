@@ -7,7 +7,10 @@
   },
   "scripts": {
     "jt": "node tools/jt/jt.mjs",
-    "db:migrate": "wrangler d1 migrations apply jteam --remote -c infra/wrangler.jsonc"
+    "db:migrate": "wrangler d1 migrations apply jteam --remote -c infra/wrangler.jsonc",
+    "viewer:dev": "wrangler dev -c apps/viewer/wrangler.jsonc --port 8788",
+    "viewer:deploy": "wrangler deploy -c apps/viewer/wrangler.jsonc",
+    "viewer:seed": "node apps/viewer/seed.mjs"
   },
   "devDependencies": {
     "wrangler": "4.54.0"

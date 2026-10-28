@@ -70,3 +70,21 @@ npm run jt -- archive --dry-run
 ```
 
 沒有出現錯誤，就代表 Cloudflare 連線正常。
+
+## 6. 成品瀏覽頁的 Cloudflare Access
+
+網址：<https://jteam-viewer.survey-api.workers.dev>
+
+Access 設好之前，瀏覽頁打得開，但所有成品和資料都會回 401，不會外洩。
+
+1. 打開 Cloudflare Dashboard → **Workers & Pages** → `jteam-viewer` → **Settings** → **Domains & Routes**
+2. 在 `workers.dev` 那一列打開 **Cloudflare Access**
+   - 第一次用 Zero Trust 會要你取一個 team 名稱，並選方案：選 **Free**（50 人以內免費）
+3. 點 **Manage Cloudflare Access** 進入這個 Access 應用程式，確認：
+   - **Policies**：只有一條 Allow，Include → Emails → `linmiepii@gmail.com`
+   - **Login methods**：One-time PIN
+4. 在應用程式的 **Overview** 找到這兩個值，貼給 Claude（不是密鑰，可以直接貼在對話）：
+   - **Application Audience (AUD) Tag**：一長串英數字
+   - **Team domain**：`<team 名稱>.cloudflareaccess.com`
+
+Claude 會把它們填進 `apps/viewer/wrangler.jsonc` 再部署，瀏覽頁就會開始驗證登入。

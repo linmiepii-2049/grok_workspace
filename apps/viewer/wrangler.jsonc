@@ -1,0 +1,39 @@
+// jteam-viewer：成品瀏覽頁（手機優先）
+// 部署：npm run viewer:deploy；本機：npm run viewer:dev（用本機 D1 / R2，先跑 npm run viewer:seed 複製線上資料；需 apps/viewer/.dev.vars 設 DEV_BYPASS=1）
+{
+  "name": "jteam-viewer",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-10-01",
+  "account_id": "090a04034814d8905c2a759afa46d73e",
+  "workers_dev": true,
+  // 預覽網址不在 Access 保護範圍內，關掉
+  "preview_urls": false,
+  "observability": { "enabled": true },
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*", "/files/*"]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "jteam",
+      "database_id": "5d9e7ec0-4985-4c28-899b-d41978542335"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "BUCKET",
+      "bucket_name": "jteam"
+    }
+  ],
+  "vars": {
+    // Cloudflare Access 設定好後填入；沒填時 API 一律拒絕
+    "ACCESS_TEAM_DOMAIN": "",
+    "ACCESS_AUD": "",
+    "ALLOWED_EMAIL": "linmiepii@gmail.com",
+    // R2 免費額度，用量面板以此計算百分比
+    "R2_QUOTA_BYTES": "10737418240"
+  }
+}
