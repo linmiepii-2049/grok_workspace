@@ -191,7 +191,7 @@ offload_jobs(id, artifact_ids JSON, status, error, created_at, finished_at)
 | P4 ✅ | （2026-10-28 完成：jteam-viewer.survey-api.workers.dev，Access + JWT 驗證）jteam-viewer + Access + 下載到裝置                                                           | 手機登入看得到範例成品                        |
 | P5 ✅ | （2026-10-28 完成：93MB 影片 16 秒搬完，md5 相符、R2 已刪、縮圖已產生）移到 Google Drive（Workflow + OAuth + R2 用量面板）                                          | 100MB 測試影片搬到 Drive、md5 相符、R2 已刪除 |
 | P6 ✅ | （2026-10-28：改為開新 vault，舊 iCloud vault 不遷移；JT-Vault 與每週 D1 備份已上線，iPad Obsidian Git 雙向同步已驗證）JT-Vault + backup workflow                                                              | 手機 Obsidian 同步成功                        |
-| P7   | **手機端全流程實測**：claude.ai/code 開新專案 → 產圖 + HTML + 影片 → 瀏覽頁看到 → 搬到 Drive | 全程不碰 Mac                                  |
+| P7 ✅ | （2026-10-28 完成：手機產出 → 自動歸檔 → 瀏覽 → 搬 Drive → 雲端寫筆記 → 手機同步）**手機端全流程實測**：claude.ai/code 開新專案 → 產圖 + HTML + 影片 → 瀏覽頁看到 → 搬到 Drive | 全程不碰 Mac                                  |
 | 之後 | 逐一重寫既有 skill（每個 skill 一個 PR）                                                     | 每個 skill 通過 CI 並在雲端實測               |
 
 ## 10. 風險 / 待驗證

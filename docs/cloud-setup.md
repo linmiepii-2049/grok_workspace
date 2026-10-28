@@ -49,11 +49,7 @@ api.cloudflare.com
 CLOUDFLARE_API_TOKEN=<步驟 1 的 token>
 ```
 
-**Setup script**：
-
-```bash
-npm ci
-```
+**Setup script**：留空。套件由 JT-Projects 的 SessionStart hook 自動安裝（`.claude/settings.json`），這樣同一個環境開 JT-Vault 也不會出錯。
 
 ## 5. 驗證
 
