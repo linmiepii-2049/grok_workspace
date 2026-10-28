@@ -132,3 +132,19 @@ openssl rand -base64 32 | npx wrangler secret put TOKEN_KEY -c apps/viewer/wrang
 ### 7.3 連結
 
 打開瀏覽頁首頁最下方「Google Drive」→ **連結 Google Drive** → 選 `linmiepii@gmail.com` → 允許。回到瀏覽頁會顯示「已連結」。
+
+## 8. Obsidian 筆記庫（JT-Vault）
+
+筆記庫是獨立的 private repo `linmiepii-2049/JT-Vault`（舊的 iCloud AI-vault 不再使用）。手機、平板的設定步驟在 JT-Vault 的 README。
+
+在 claude.ai/code 整理筆記：開新 session 時選 **JT-Vault** repo（不是 JT-Projects），Claude 會依 JT-Vault 的 CLAUDE.md 放對資料夾、加 frontmatter，改完 commit 推上 GitHub，手機的 Obsidian Git 會自動拉下來。
+
+## 9. 備份
+
+| 資料 | 備份方式 |
+| --- | --- |
+| D1 | 每週一 03:00 自動匯出到 R2 `backups/d1/`，保留 90 天；另有 D1 Time Travel 30 天 |
+| 程式、skills、筆記 | GitHub repo 本身 |
+| 成品檔案 | R2；搬到 Drive 的以 Drive 為準 |
+
+手動備份：GitHub → JT-Projects → Actions → backup → Run workflow。
