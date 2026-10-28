@@ -33,6 +33,16 @@
   <body>
     <a class="skip" href="#app">跳到內容</a>
     <main id="app" tabindex="-1" aria-live="polite"></main>
+    <dialog id="confirm" aria-labelledby="confirm-title">
+      <form method="dialog">
+        <h2 id="confirm-title">移到 Google Drive？</h2>
+        <div class="confirm-text"></div>
+        <div class="confirm-actions">
+          <button class="btn" value="cancel">取消</button>
+          <button class="btn primary" value="ok">確定搬移</button>
+        </div>
+      </form>
+    </dialog>
     <script type="module" src="/app.js"></script>
   </body>
 </html>

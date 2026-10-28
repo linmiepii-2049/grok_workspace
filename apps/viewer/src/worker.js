@@ -1,5 +1,8 @@
 // jteam-viewer Worker：/api/* 回傳 D1 資料，/files/* 從 R2 串流成品；其餘由靜態資源處理
 // 每個請求都驗證 Cloudflare Access 的 JWT：就算有人繞過 Access（例如設定被關掉），也拿不到資料
+import * as gdrive from "./gdrive.js";
+
+export { OffloadWorkflow } from "./offload.js";
 
 const json = (data, init = {}) =>
   new Response(JSON.stringify(data), {
@@ -92,7 +95,7 @@ async function verifyAccess(request, env) {
 
 const LATEST_ONLY = `a.version = (SELECT MAX(b.version) FROM artifacts b WHERE b.project_id = a.project_id AND b.path = a.path)`;
 const LIST_COLUMNS = `a.id, a.kind, a.title, a.path, a.version, a.content_type, a.size, a.storage, a.gdrive_url, a.created_at,
-  substr(a.body, 1, 160) AS excerpt,
+  a.thumb_key IS NOT NULL AS has_thumb, substr(a.body, 1, 160) AS excerpt,
   (SELECT COUNT(*) FROM artifacts b WHERE b.project_id = a.project_id AND b.path = a.path) AS versions`;
 
 async function listProjects(env) {
@@ -129,7 +132,7 @@ async function getProject(env, slug) {
 async function getArtifact(env, id) {
   const artifact = await env.DB.prepare(
     `SELECT a.id, a.kind, a.title, a.path, a.version, a.content_type, a.size, a.sha256, a.git_commit, a.body,
-            a.storage, a.gdrive_url, a.offloaded_at, a.created_at, a.meta, p.slug AS project_slug, p.name AS project_name
+            a.storage, a.gdrive_url, a.gdrive_file_id, a.offloaded_at, a.thumb_key IS NOT NULL AS has_thumb, a.created_at, a.meta, p.slug AS project_slug, p.name AS project_name
      FROM artifacts a JOIN projects p ON p.id = a.project_id WHERE a.id = ?`,
   )
     .bind(id)
@@ -188,11 +191,20 @@ const SANDBOXED_TYPES = /^(text\/html|image\/svg\+xml)/;
 
 async function serveFile(request, env, ctx, id) {
   const row = await env.DB.prepare(
-    `SELECT id, path, content_type, storage, r2_key, gdrive_url FROM artifacts WHERE id = ?`,
+    `SELECT id, path, content_type, storage, r2_key, thumb_key, gdrive_url FROM artifacts WHERE id = ?`,
   )
     .bind(id)
     .first();
   if (!row) return error(404, "找不到這個成品");
+  const url = new URL(request.url);
+  // 已搬到 Drive 的圖片仍保留縮圖
+  if (url.searchParams.has("thumb") && row.thumb_key) {
+    const thumb = await env.BUCKET.get(row.thumb_key);
+    if (thumb)
+      return new Response(thumb.body, {
+        headers: { "content-type": "image/webp", "cache-control": "private, max-age=86400" },
+      });
+  }
   if (row.storage === "gdrive") return Response.redirect(row.gdrive_url, 302);
   if (row.storage !== "r2" || !row.r2_key)
     return error(409, "這個成品正在搬移中");
@@ -216,7 +228,6 @@ async function serveFile(request, env, ctx, id) {
       "sandbox allow-scripts allow-popups allow-forms",
     );
 
-  const url = new URL(request.url);
   const filename = row.path.split("/").pop();
   headers.set(
     "content-disposition",
@@ -252,36 +263,158 @@ async function serveFile(request, env, ctx, id) {
   return new Response(object.body, { headers });
 }
 
+// ---------- 搬到 Google Drive ----------
+
+// 一個 Workflow 有步驟上限，每件成品約 7 步加上分段數；100 件留足餘裕
+const MAX_OFFLOAD = 100;
+
+// 選取要搬的成品：指定 id，或整個專案（含所有版本）；只取還在 R2 的
+async function selectForOffload(env, body) {
+  if (body.project) {
+    const { results } = await env.DB.prepare(
+      `SELECT a.id, a.size FROM artifacts a JOIN projects p ON p.id = a.project_id WHERE p.slug = ? AND a.storage = 'r2'`,
+    )
+      .bind(String(body.project))
+      .all();
+    return results;
+  }
+  const ids = (Array.isArray(body.ids) ? body.ids : []).map(Number).filter(Number.isInteger);
+  if (!ids.length) return [];
+  const { results } = await env.DB.prepare(
+    `SELECT id, size FROM artifacts WHERE storage = 'r2' AND id IN (SELECT value FROM json_each(?))`,
+  )
+    .bind(JSON.stringify(ids))
+    .all();
+  return results;
+}
+
+async function offloadPreview(env, body) {
+  const rows = await selectForOffload(env, body);
+  return { count: rows.length, bytes: rows.reduce((s, r) => s + r.size, 0), max: MAX_OFFLOAD };
+}
+
+async function startOffload(env, body) {
+  const drive = await gdrive.status(env);
+  if (!drive.connected) return error(409, "尚未連結 Google Drive");
+  const rows = await selectForOffload(env, body);
+  if (!rows.length) return error(400, "沒有可搬移的成品");
+  if (rows.length > MAX_OFFLOAD) return error(400, `一次最多搬 ${MAX_OFFLOAD} 件，目前選了 ${rows.length} 件`);
+
+  // 原子地把狀態改成搬移中：同時按兩次也只會有一個 Workflow 處理同一件
+  const { results } = await env.DB.prepare(
+    `UPDATE artifacts SET storage = 'offloading' WHERE storage = 'r2' AND id IN (SELECT value FROM json_each(?)) RETURNING id, size`,
+  )
+    .bind(JSON.stringify(rows.map((r) => r.id)))
+    .all();
+  if (!results.length) return error(409, "這些成品已在搬移中");
+  const ids = results.map((r) => r.id);
+  const jobId = crypto.randomUUID();
+  await env.DB.prepare(`INSERT INTO offload_jobs (id, artifact_ids) VALUES (?, ?)`).bind(jobId, JSON.stringify(ids)).run();
+
+  try {
+    await env.OFFLOAD.create({ id: jobId, params: { jobId, artifactIds: ids } });
+  } catch (e) {
+    await env.DB.batch([
+      env.DB.prepare(`UPDATE artifacts SET storage = 'r2' WHERE storage = 'offloading' AND id IN (SELECT value FROM json_each(?))`).bind(
+        JSON.stringify(ids),
+      ),
+      env.DB.prepare(`UPDATE offload_jobs SET status = 'failed', error = ? WHERE id = ?`).bind(`無法啟動：${e.message}`, jobId),
+    ]);
+    throw e;
+  }
+  return json({ job_id: jobId, count: ids.length, bytes: results.reduce((s, r) => s + r.size, 0) }, { status: 202 });
+}
+
+async function listJobs(env) {
+  const { results } = await env.DB.prepare(
+    `SELECT id, status, json_array_length(artifact_ids) AS total, done_count, failed_count, error, created_at, finished_at
+     FROM offload_jobs ORDER BY created_at DESC LIMIT 10`,
+  ).all();
+  return results;
+}
+
 // ---------- 路由 ----------
+
+const STATE_COOKIE = "gd_state";
+
+function readCookie(request, name) {
+  const match = (request.headers.get("cookie") || "").match(new RegExp(`(?:^|;\\s*)${name}=([^;]+)`));
+  return match?.[1] ?? null;
+}
+
+async function handleGdrive(request, env, url, action, id) {
+  if (action === "status") return json(await gdrive.status(env));
+  if (!gdrive.driveConfigured(env)) return error(503, "尚未設定 Google OAuth（GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET / TOKEN_KEY）");
+
+  if (action === "connect") {
+    const state = crypto.randomUUID();
+    return new Response(null, {
+      status: 302,
+      headers: {
+        location: gdrive.authUrl(env, url.origin, state),
+        "set-cookie": `${STATE_COOKIE}=${state}; Path=/api/gdrive; HttpOnly; Secure; SameSite=Lax; Max-Age=600`,
+      },
+    });
+  }
+
+  if (action === "callback") {
+    const back = (q) =>
+      new Response(null, {
+        status: 302,
+        headers: { location: `/?${q}`, "set-cookie": `${STATE_COOKIE}=; Path=/api/gdrive; Max-Age=0` },
+      });
+    const state = url.searchParams.get("state");
+    if (!state || state !== readCookie(request, STATE_COOKIE)) return back("drive=error&msg=" + encodeURIComponent("驗證失敗，請重試"));
+    if (url.searchParams.get("error")) return back("drive=error&msg=" + encodeURIComponent(url.searchParams.get("error")));
+    try {
+      await gdrive.connect(env, url.origin, url.searchParams.get("code"));
+      return back("drive=connected");
+    } catch (e) {
+      return back("drive=error&msg=" + encodeURIComponent(e.message));
+    }
+  }
+
+  if (action === "check" && id) {
+    const row = await env.DB.prepare(`SELECT gdrive_file_id FROM artifacts WHERE id = ? AND storage = 'gdrive'`).bind(Number(id)).first();
+    if (!row) return error(404, "這個成品不在 Drive");
+    try {
+      return json({ exists: await gdrive.fileExists(env, row.gdrive_file_id) });
+    } catch (e) {
+      return json({ exists: null, error: e.message });
+    }
+  }
+  return error(404, "找不到");
+}
 
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
     const user = await verifyAccess(request, env);
     if (!user) {
-      return error(
-        401,
-        env.ACCESS_AUD
-          ? "未登入或沒有權限"
-          : "尚未設定 Cloudflare Access，API 暫停服務",
-      );
+      return error(401, env.ACCESS_AUD ? "未登入或沒有權限" : "尚未設定 Cloudflare Access，API 暫停服務");
     }
-    if (request.method !== "GET" && request.method !== "HEAD")
-      return error(405, "不支援的方法");
+
+    const isWrite = request.method === "POST";
+    if (!isWrite && request.method !== "GET" && request.method !== "HEAD") return error(405, "不支援的方法");
+    // 寫入只接受同源 JSON：跨站表單送不出 application/json，加上 Origin 檢查擋 CSRF
+    if (isWrite && (request.headers.get("origin") !== url.origin || !request.headers.get("content-type")?.startsWith("application/json"))) {
+      return error(403, "拒絕跨站請求");
+    }
 
     try {
-      const parts = url.pathname
-        .split("/")
-        .filter(Boolean)
-        .map(decodeURIComponent);
-      if (parts[0] === "files" && parts[1])
-        return serveFile(request, env, ctx, Number(parts[1]));
+      const parts = url.pathname.split("/").filter(Boolean).map(decodeURIComponent);
+      if (parts[0] === "files" && parts[1] && !isWrite) return serveFile(request, env, ctx, Number(parts[1]));
 
       if (parts[0] === "api") {
-        const [, resource, id] = parts;
+        const [, resource, id, sub] = parts;
+        if (isWrite) {
+          const body = await request.json().catch(() => ({}));
+          if (resource === "offload" && id === "preview") return json(await offloadPreview(env, body));
+          if (resource === "offload" && !id) return startOffload(env, body);
+          return error(404, "找不到");
+        }
         if (resource === "me") return json(user);
-        if (resource === "projects" && !id)
-          return json(await listProjects(env));
+        if (resource === "projects" && !id) return json(await listProjects(env));
         if (resource === "projects" && id) {
           const project = await getProject(env, id);
           return project ? json(project) : error(404, "找不到這個專案");
@@ -290,9 +423,10 @@ export default {
           const artifact = await getArtifact(env, Number(id));
           return artifact ? json(artifact) : error(404, "找不到這個成品");
         }
-        if (resource === "search")
-          return json(await search(env, url.searchParams.get("q")));
+        if (resource === "search") return json(await search(env, url.searchParams.get("q")));
         if (resource === "usage") return json(await usage(env));
+        if (resource === "gdrive") return handleGdrive(request, env, url, id, sub);
+        if (resource === "offload" && id === "jobs") return json(await listJobs(env));
       }
       return error(404, "找不到");
     } catch (e) {

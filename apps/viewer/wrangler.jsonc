@@ -28,6 +28,17 @@
       "bucket_name": "jteam"
     }
   ],
+  // 搬到 Google Drive 的長時間任務
+  "workflows": [
+    {
+      "name": "jteam-offload",
+      "binding": "OFFLOAD",
+      "class_name": "OffloadWorkflow"
+    }
+  ],
+  // 搬到 Drive 前替圖片產生縮圖
+  "images": { "binding": "IMAGES" },
+  // 另有 secrets（wrangler secret put）：GOOGLE_CLIENT_ID、GOOGLE_CLIENT_SECRET、TOKEN_KEY
   "vars": {
     // Cloudflare Access 設定好後填入；沒填時 API 一律拒絕
     "ACCESS_TEAM_DOMAIN": "survey-api.cloudflareaccess.com",

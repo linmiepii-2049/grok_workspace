@@ -8,7 +8,7 @@ import { join } from "node:path";
 
 const ROOT = new URL("../..", import.meta.url).pathname;
 const CONFIG = join(ROOT, "apps/viewer/wrangler.jsonc");
-const LOCAL_STATE = join(ROOT, ".wrangler/state/v3");
+const LOCAL_STATE = join(ROOT, "apps/viewer/.wrangler/state/v3"); // wrangler 把本機資料放在設定檔旁邊
 const wrangler = (...args) =>
   execFileSync(join(ROOT, "node_modules/.bin/wrangler"), [...args, "-c", CONFIG], { cwd: ROOT, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
 

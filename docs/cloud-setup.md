@@ -88,3 +88,47 @@ Access 設好之前，瀏覽頁打得開，但所有成品和資料都會回 401
    - **Team domain**：`<team 名稱>.cloudflareaccess.com`
 
 Claude 會把它們填進 `apps/viewer/wrangler.jsonc` 再部署，瀏覽頁就會開始驗證登入。
+
+## 7. Google Drive（移到 Drive 功能）
+
+### 7.1 建立 Google Cloud 專案與 OAuth 用戶端
+
+1. 打開 <https://console.cloud.google.com/projectcreate>，專案名稱填 `JTeam`，建立
+2. 左上選單 → **API 和服務** → **程式庫**，搜尋 **Google Drive API** → **啟用**
+3. 左上選單 → **Google Auth Platform**（或「OAuth 同意畫面」）→ **開始**
+   - 應用程式名稱：`JTeam Viewer`；使用者支援電子郵件：`linmiepii@gmail.com`
+   - 目標對象：**外部**
+   - 聯絡資訊：`linmiepii@gmail.com`
+4. **資料存取** → **新增或移除範圍**，勾選這三個後儲存：
+   - `.../auth/drive.file`
+   - `openid`
+   - `.../auth/userinfo.email`
+5. **目標對象** → **發布應用程式** → 確認，狀態要變成「**實際運作中**」
+   - ⚠️ 停在「測試」的話，授權每 7 天就失效，搬移會突然壞掉
+   - `drive.file` 屬於非敏感範圍，發布不需要 Google 審查
+6. **用戶端** → **建立用戶端**
+   - 應用程式類型：**網頁應用程式**；名稱：`jteam-viewer`
+   - 已授權的重新導向 URI：`https://jteam-viewer.survey-api.workers.dev/api/gdrive/callback`
+   - 建立後複製 **用戶端 ID** 和 **用戶端密鑰**
+
+### 7.2 把密鑰存進 Worker
+
+在 Mac 終端機、JT-Projects 資料夾裡依序執行，每個指令出現提示後貼上對應的值：
+
+```bash
+npx wrangler secret put GOOGLE_CLIENT_ID -c apps/viewer/wrangler.jsonc
+```
+
+```bash
+npx wrangler secret put GOOGLE_CLIENT_SECRET -c apps/viewer/wrangler.jsonc
+```
+
+這一行不用貼任何東西，它會自動產生加密金鑰（用來加密存在 D1 的 Google 授權）：
+
+```bash
+openssl rand -base64 32 | npx wrangler secret put TOKEN_KEY -c apps/viewer/wrangler.jsonc
+```
+
+### 7.3 連結
+
+打開瀏覽頁首頁最下方「Google Drive」→ **連結 Google Drive** → 選 `linmiepii@gmail.com` → 允許。回到瀏覽頁會顯示「已連結」。
