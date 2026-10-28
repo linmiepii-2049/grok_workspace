@@ -13,7 +13,8 @@ jobs:
       AUTH: "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}"
     steps:
       - name: Team domain
-        run: curl -s -H "$AUTH" "$CF/access/organizations" | jq '{success, auth_domain: .result.auth_domain, name: .result.name, errors}'
+        run: |
+          curl -s -H "$AUTH" "$CF/access/organizations" | jq '{success, auth_domain: .result.auth_domain, name: .result.name, errors}'
 
       - name: Access 應用程式
         run: |
