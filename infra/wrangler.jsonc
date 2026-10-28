@@ -1,0 +1,21 @@
+// JTeam 共用資源設定：D1 migration 與 R2 從這裡管理
+// 用法：cd infra && wrangler d1 migrations apply jteam --remote
+{
+  "name": "jteam-infra",
+  "account_id": "090a04034814d8905c2a759afa46d73e",
+  "compatibility_date": "2026-10-01",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "jteam",
+      "database_id": "5d9e7ec0-4985-4c28-899b-d41978542335",
+      "migrations_dir": "d1/migrations"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "BUCKET",
+      "bucket_name": "jteam"
+    }
+  ]
+}

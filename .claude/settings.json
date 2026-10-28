@@ -1,0 +1,25 @@
+{
+  "extraKnownMarketplaces": {
+    "jt-skills": {
+      "source": {
+        "source": "github",
+        "repo": "linmiepii-2049/JT-Skills"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "skill-template@jt-skills": true
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/tools/jt/jt.mjs\" check --hook"
+          }
+        ]
+      }
+    ]
+  }
+}

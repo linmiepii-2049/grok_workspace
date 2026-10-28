@@ -1,0 +1,16 @@
+.DS_Store
+node_modules/
+.wrangler/
+.env
+.env.*
+.dev.vars
+
+# 影片與音檔不進 git（GitHub 單檔上限 100MB），由 `jt archive` 直傳 R2，只留 .r2.json 指標檔
+projects/*/outputs/**/*.mp4
+projects/*/outputs/**/*.mov
+projects/*/outputs/**/*.webm
+projects/*/outputs/**/*.mkv
+projects/*/outputs/**/*.m4v
+projects/*/outputs/**/*.wav
+projects/*/outputs/**/*.mp3
+projects/*/outputs/**/*.m4a

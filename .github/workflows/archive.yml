@@ -1,0 +1,30 @@
+name: archive
+
+# 任何分支推上來都歸檔：雲端 session 會推到 claude/* 分支，不必等合併
+# 以 專案+路徑+sha256 去重，合併到 main 時不會重複歸檔
+on:
+  push:
+    paths: ["projects/**"]
+  workflow_dispatch:
+
+concurrency:
+  group: archive # 同時只跑一個，避免版本號競爭
+  cancel-in-progress: false
+
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: 歸檔到 R2 / D1
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: npm run jt -- archive

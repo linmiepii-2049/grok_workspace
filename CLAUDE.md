@@ -1,0 +1,50 @@
+# JT-Projects
+
+Jason 的雲端工作區（monorepo）。手機、平板或 Mac 開 Claude Code 都在這裡工作，成品自動歸檔到 Cloudflare R2 / D1。
+
+## 使用者偏好
+
+- 一律用繁體中文回覆
+- 每次回覆以 `律伸` 開頭
+- 需求不明確時，先問清楚再寫程式
+- 使用者要求先提案時，提出方案後等待確認再實作
+- 被糾正後，把規則寫進 `memory/`（見下方「記憶」）
+
+## 專案與成品
+
+- 新專案一律用 `npm run jt -- new <slug> "<名稱>"` 建立，會產生 `projects/<yyyy-mm>-<slug>/`
+- **成品一律放在 `projects/<專案>/outputs/`**，只有這裡的檔案會被歸檔；草稿、原始碼放在專案資料夾的其他地方
+- 檔案類型由副檔名判斷：
+  - 圖片：png jpg webp svg gif avif
+  - 影片：mp4 mov webm mkv
+  - HTML：html
+  - 文案：md txt
+  - 簡報：pptx、`*.slides.html`，或放在 `outputs/slides/` 底下
+- 歸檔：
+  - 小檔推上 GitHub 後，Actions 會自動歸檔，不用手動處理
+  - 影片和音檔被 `.gitignore` 排除，不進 git，要在 session 內執行 `npm run jt -- archive` 直傳 R2
+  - session 結束時，Stop hook 會檢查有沒有沒歸檔的大檔
+- 同一個檔案改版後再歸檔，會存成新版本，舊版保留
+
+## 記憶
+
+雲端 session 沒有本機的記憶庫，記憶改存在 repo 裡，進版控：
+
+- 每條記憶一個檔案：`memory/<kebab-case>.md`，格式和規則見 `memory/README.md`
+- 新增後在 `memory/MEMORY.md` 加一行索引
+- 開始工作前先讀 `memory/MEMORY.md`
+
+## 安全
+
+- 密鑰（Cloudflare token、API key）只放環境變數或 GitHub Secrets，絕不寫進檔案或 commit
+- 不刪除 R2 物件；要釋出 R2 空間，用 jteam-viewer 的「移到 Google Drive」
+
+## 目錄
+
+| 路徑        | 用途                              |
+| ----------- | --------------------------------- |
+| `projects/` | 各專案                            |
+| `memory/`   | 記憶                              |
+| `tools/jt/` | `jt` CLI（new / archive / check） |
+| `infra/`    | Cloudflare 設定、D1 migration     |
+| `docs/`     | 計畫、雲端環境設定說明            |
