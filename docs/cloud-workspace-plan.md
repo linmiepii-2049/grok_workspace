@@ -188,7 +188,7 @@ offload_jobs(id, artifact_ids JSON, status, error, created_at, finished_at)
 | P1 ✅ | 建 D1 / R2、套 migration（2026-10-28 完成，D1 id `5d9e7ec0-…`，皆在 APAC）                                                                     | `wrangler d1 execute` 查得到表                |
 | P2 ✅ | JT-Skills 骨架（2026-10-28 完成，雲端 session 實測 skill 載入通過）：marketplace、skill-template、腳本、CI                                   | 範本 plugin 能在本機與雲端安裝                |
 | P3 ✅ | （2026-10-28 完成，本機與 Actions 歸檔都驗證過）JT-Projects repo + CLAUDE.md + jt CLI + archive workflow                                     | push 範例成品後 D1 有資料、R2 有檔            |
-| P4 🟡 | （2026-10-28 已部署 jteam-viewer.survey-api.workers.dev，待設定 Access）jteam-viewer + Access + 下載到裝置                                                           | 手機登入看得到範例成品                        |
+| P4 ✅ | （2026-10-28 完成：jteam-viewer.survey-api.workers.dev，Access + JWT 驗證）jteam-viewer + Access + 下載到裝置                                                           | 手機登入看得到範例成品                        |
 | P5   | 移到 Google Drive（Workflow + OAuth + R2 用量面板）                                          | 100MB 測試影片搬到 Drive、md5 相符、R2 已刪除 |
 | P6   | JT-Vault 遷移 + backup workflow                                                              | 手機 Obsidian 同步成功                        |
 | P7   | **手機端全流程實測**：claude.ai/code 開新專案 → 產圖 + HTML + 影片 → 瀏覽頁看到 → 搬到 Drive | 全程不碰 Mac                                  |

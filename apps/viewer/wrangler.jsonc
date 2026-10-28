@@ -30,8 +30,8 @@
   ],
   "vars": {
     // Cloudflare Access 設定好後填入；沒填時 API 一律拒絕
-    "ACCESS_TEAM_DOMAIN": "",
-    "ACCESS_AUD": "",
+    "ACCESS_TEAM_DOMAIN": "survey-api.cloudflareaccess.com",
+    "ACCESS_AUD": "b681f5435eed30d43b98071e1f62656319888f06e7cc13e1854e285fb18fb88a",
     "ALLOWED_EMAIL": "linmiepii@gmail.com",
     // R2 免費額度，用量面板以此計算百分比
     "R2_QUOTA_BYTES": "10737418240"
