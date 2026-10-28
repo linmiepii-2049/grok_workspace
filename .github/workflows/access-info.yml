@@ -20,3 +20,8 @@ jobs:
         run: |
           curl -s -H "$AUTH" "$CF/access/apps" \
             | jq '{success, errors, apps: [.result[]? | {name, type, domain, self_hosted_domains, aud, policies: [.policies[]? | {name, decision, include}]}]}'
+
+      - name: jteam-viewer 應用程式完整設定
+        run: |
+          curl -s -H "$AUTH" "$CF/access/apps" \
+            | jq '.result[]? | select(.name | startswith("jteam-viewer")) | del(.policies)'
