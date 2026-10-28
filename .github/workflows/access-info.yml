@@ -1,0 +1,21 @@
+name: access-info
+
+# 手動執行：列出 Cloudflare Access 的 team domain 與各應用程式（網域、AUD、政策），用來設定與除錯 jteam-viewer
+# 只印出非機密資訊
+on:
+  workflow_dispatch:
+
+jobs:
+  info:
+    runs-on: ubuntu-latest
+    env:
+      CF: https://api.cloudflare.com/client/v4/accounts/090a04034814d8905c2a759afa46d73e
+      AUTH: "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}"
+    steps:
+      - name: Team domain
+        run: curl -s -H "$AUTH" "$CF/access/organizations" | jq '{success, auth_domain: .result.auth_domain, name: .result.name, errors}'
+
+      - name: Access 應用程式
+        run: |
+          curl -s -H "$AUTH" "$CF/access/apps" \
+            | jq '{success, errors, apps: [.result[]? | {name, type, domain, self_hosted_domains, aud, policies: [.policies[]? | {name, decision, include}]}]}'
