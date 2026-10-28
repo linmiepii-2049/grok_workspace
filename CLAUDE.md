@@ -39,6 +39,12 @@ Jason 的雲端工作區（monorepo）。手機、平板或 Mac 開 Claude Code 
 - 新增後在 `memory/MEMORY.md` 加一行索引
 - 開始工作前先讀 `memory/MEMORY.md`
 
+## Git
+
+- 一般工作（新增專案、成品、文案）**直接 commit 推到 `main`**，不用開分支或 PR：只有一個人使用，main 就是最新狀態
+- 修改 `tools/`、`apps/`、`infra/`、`.github/` 這類程式或設定時，開分支與 PR，讓使用者確認後再合併
+- 推之前先 `git pull --rebase origin main`
+
 ## 安全
 
 - 密鑰（Cloudflare token、API key）只放環境變數或 GitHub Secrets，絕不寫進檔案或 commit
