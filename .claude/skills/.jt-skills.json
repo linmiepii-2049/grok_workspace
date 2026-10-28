@@ -1,11 +1,11 @@
 {
   "_note": "由 JT-Skills 自動同步，請勿直接修改；要改 skill 請到 JT-Skills",
   "source": "linmiepii-2049/JT-Skills",
-  "commit": "8cf3f8af569dc62c6a92badca30a1c1062ef28cb",
+  "commit": "4f0c9def15ac6e02785f6950fd1e07bc095c85cf",
   "skills": {
     "skill-template": {
       "plugin": "skill-template",
-      "version": "0.1.0"
+      "version": "0.2.0"
     }
   }
 }
