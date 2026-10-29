@@ -1,0 +1,75 @@
+{
+  "theme": "beige-teal",
+  "series": "AI 工具情報",
+  "seriesEn": "AI TOOL WATCH",
+  "no": "01",
+  "emblem": "器",
+  "slides": [
+    {
+      "type": "cover",
+      "photo": "assets/03-amd-ross.jpg",
+      "title": "AMD 推出\n**FPGA AI 助手**",
+      "sub": "Ross：用說的跑 Vivado 流程"
+    },
+    {
+      "type": "statement",
+      "kicker": "做 FPGA 的注意",
+      "title": "AI 也會\n**跑 Vivado** 了",
+      "body": "AMD 推出 Ross Agentic AI Assistant，把模擬、Lint、HLS 優化做成 AI 技能，在 Claude Code、Cursor、Copilot 裡直接用說的。"
+    },
+    {
+      "type": "steps",
+      "title": "它會做的 **4 類事**",
+      "items": [
+        ["Vivado", "RTL 模擬、Lint、時序檢查、用一句話設定 IP"],
+        ["Vitis HLS", "MATLAB 轉 C++，對著效能目標反覆優化"],
+        ["硬體除錯", "在板子上觸發 ILA 抓波形、讀寫 VIO"],
+        ["Vitis AI", "ONNX 模型量化，部署到 AMD NPU"]
+      ]
+    },
+    {
+      "type": "compare",
+      "title": "以前 vs\n**交給 Ross**",
+      "a": "自己來",
+      "b": "交給 Ross",
+      "rows": [
+        ["翻 UG 文件找指令", "**直接查**官方文件"],
+        ["Lint 報告一條條看", "依**嚴重程度**排好"],
+        ["HLS pragma 一個個試", "對著目標**自動優化**"],
+        ["手動開 ILA 抓波形", "**一句話**觸發匯出"]
+      ]
+    },
+    {
+      "type": "steps",
+      "title": "怎麼裝？**3 步**",
+      "items": [
+        ["下載", "AMD 官網登入帳號，下載 VS Code 擴充或 MCP Server"],
+        ["裝技能", "GitHub：xilinx/ross-ai-assistant，npx skills add"],
+        ["開始問", "在 Claude Code、Cursor 或 Copilot 裡下指令"]
+      ]
+    },
+    {
+      "type": "statement",
+      "kicker": "裝之前先看",
+      "title": "要有\n**Vivado 授權**",
+      "body": "Ross 底層還是呼叫 Vivado 執行，工具和授權要先裝好。VS Code 擴充和 MCP Server 二選一，不要同時裝。"
+    },
+    {
+      "type": "beforeafter",
+      "title": "指令比比看",
+      "before": "幫我檢查這個設計。",
+      "after": "對 top.v 跑 RTL lint，依嚴重程度排序，每個問題附建議的修法。",
+      "note": "講清楚檔案、要做什麼、要什麼格式"
+    },
+    {
+      "type": "quote",
+      "text": "工具越來越聰明，\n**懂流程的人**\n才用得好。"
+    },
+    {
+      "type": "cta",
+      "title": "身邊有做 FPGA 的？\n**分享給他**",
+      "body": "收藏這篇，下次裝 Ross\n直接照著做",
+      "button": "收藏＋分享"
+    }
+  ]
+}
