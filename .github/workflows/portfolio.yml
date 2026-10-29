@@ -1,0 +1,76 @@
+name: portfolio
+
+# 投資追蹤（tools/portfolio）：重算資產快照、抓行事曆與新聞、產生晨報，寫進 D1
+# 晨報 md 由這裡 commit 回 main；GITHUB_TOKEN 的 push 不會觸發 archive.yml，所以在這裡直接歸檔
+on:
+  schedule:
+    - cron: "30 6 * * 1-5" # 台北週一～五 14:30：台股收盤後，只重算快照
+    - cron: "0 22 * * 1-5" # 台北週二～六 06:00：美股收盤後，快照＋行事曆＋晨報
+  push:
+    branches: [main]
+    paths: ["projects/2026-10-portfolio/ledger.yaml", "tools/portfolio/**"]
+  workflow_dispatch:
+    inputs:
+      tasks:
+        description: 要跑的任務
+        type: choice
+        options: ["snapshot", "snapshot events", "snapshot events brief"]
+        default: "snapshot events brief"
+
+concurrency:
+  group: portfolio
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: 單元測試
+        run: node --test tools/portfolio/ledger.test.mjs
+
+      - name: 決定任務
+        id: tasks
+        env:
+          SCHEDULE: ${{ github.event.schedule }}
+          INPUT: ${{ inputs.tasks }}
+        run: |
+          if [ -n "$INPUT" ]; then t="$INPUT"
+          elif [ "$SCHEDULE" = "0 22 * * 1-5" ]; then t="snapshot events brief"
+          else t="snapshot"; fi
+          echo "list=$t" >> "$GITHUB_OUTPUT"
+
+      - name: 更新投資追蹤
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          FINMIND_TOKEN: ${{ secrets.FINMIND_TOKEN }}
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          TASKS: ${{ steps.tasks.outputs.list }}
+        run: node tools/portfolio/run.mjs $TASKS
+
+      - name: commit 晨報並歸檔
+        if: contains(steps.tasks.outputs.list, 'brief')
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          git add projects/2026-10-portfolio/outputs/briefs
+          git diff --cached --quiet && { echo "沒有新的晨報"; exit 0; }
+          git config user.name "github-actions[bot]"
+          git config user.email "41898+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore(portfolio): 持股晨報 $(TZ=Asia/Taipei date +%F)"
+          git pull --rebase origin main
+          git push origin HEAD:main
+          npm run jt -- archive

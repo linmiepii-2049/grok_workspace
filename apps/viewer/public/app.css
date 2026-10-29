@@ -1000,3 +1000,9 @@ dialog#confirm h2 {
 .sheet.selecting {
   margin-bottom: 96px;
 }
+
+.topbar-end {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+}

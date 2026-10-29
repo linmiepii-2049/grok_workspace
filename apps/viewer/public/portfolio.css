@@ -1,0 +1,552 @@
+/* 投資追蹤頁：沿用 app.css 的紙色與字體；圖表色依 dataviz 參考色盤前三格（任兩色色盲下仍可分辨） */
+
+:root {
+  --s1: #2a78d6; /* 我的組合 */
+  --s2: #eb6834; /* 0050 */
+  --s3: #1baf7a; /* VOO */
+  /* 台灣習慣：紅漲綠跌，一律搭配 ▲▼ 符號 */
+  --up: #c8322a;
+  --down: #12805a;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --s1: #3987e5;
+    --s2: #d95926;
+    --s3: #199e70;
+    --up: #ff6a55;
+    --down: #3fbf86;
+  }
+}
+
+:root[data-theme="dark"] {
+  --s1: #3987e5;
+  --s2: #d95926;
+  --s3: #199e70;
+  --up: #ff6a55;
+  --down: #3fbf86;
+}
+
+.num {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+}
+
+.up {
+  color: var(--up);
+}
+
+.down {
+  color: var(--down);
+}
+
+/* ---------- 頁首 ---------- */
+
+.pf-head {
+  padding-bottom: 16px;
+  border-bottom: 3px double var(--ink);
+}
+
+.pf-head .mono {
+  text-transform: uppercase;
+}
+
+.pf-hero {
+  margin: 6px 0 2px;
+  font: 900 clamp(38px, 11vw, 72px) / 1 var(--serif);
+  letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
+}
+
+.pf-hero small {
+  font: 500 16px var(--sans);
+  color: var(--ink-2);
+  margin-left: 6px;
+}
+
+.pf-day {
+  font-size: 15px;
+}
+
+/* ---------- 分頁 ---------- */
+
+.pf-tabs {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  margin: 14px calc(var(--gutter) * -1) 18px;
+  padding: 0 var(--gutter) 2px;
+  scrollbar-width: none;
+}
+
+.pf-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.pf-tabs a {
+  flex: none;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid var(--rule);
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.pf-tabs a[aria-current="page"] {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+}
+
+/* ---------- 數字卡 ---------- */
+
+.pf-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+@media (min-width: 720px) {
+  .pf-stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.pf-stat {
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 12px;
+  background: var(--paper-2);
+  min-width: 0;
+}
+
+.pf-stat .label {
+  display: block;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.pf-stat .value {
+  display: block;
+  font-size: 19px;
+  font-weight: 500;
+  margin-top: 2px;
+  overflow-wrap: anywhere;
+}
+
+.pf-stat .sub {
+  display: block;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+/* ---------- 圖表 ---------- */
+
+.pf-card {
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 14px 12px 10px;
+  margin-bottom: 18px;
+}
+
+.pf-card h2 {
+  margin: 0 0 2px;
+  font: 900 19px/1.3 var(--serif);
+}
+
+.pf-card .hint {
+  font-size: 13px;
+  color: var(--ink-2);
+  margin: 0 0 8px;
+}
+
+.pf-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  font-size: 13px;
+  color: var(--ink-2);
+  margin-bottom: 6px;
+}
+
+.pf-legend span::before {
+  content: "";
+  display: inline-block;
+  width: 14px;
+  height: 2px;
+  margin-right: 6px;
+  vertical-align: middle;
+  background: var(--c);
+}
+
+.pf-chart {
+  position: relative;
+  touch-action: pan-y;
+}
+
+.pf-chart svg {
+  display: block;
+  width: 100%;
+  overflow: visible;
+}
+
+.pf-chart .grid line {
+  stroke: var(--rule);
+  stroke-width: 1;
+}
+
+.pf-chart .axis text {
+  fill: var(--ink-3);
+  font: 11px var(--mono);
+}
+
+.pf-chart .zero {
+  stroke: var(--ink-3);
+  stroke-width: 1;
+}
+
+.pf-chart .series {
+  fill: none;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.pf-chart .area {
+  opacity: 0.12;
+}
+
+.pf-chart .end-label {
+  font: 500 11px var(--mono);
+  fill: var(--ink-2);
+}
+
+.pf-chart .cross {
+  stroke: var(--ink-2);
+  stroke-width: 1;
+}
+
+.pf-chart .dot {
+  stroke: var(--paper);
+  stroke-width: 2;
+}
+
+.pf-tip {
+  position: fixed;
+  z-index: 20;
+  pointer-events: none;
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: var(--radius);
+  padding: 8px 10px;
+  font-size: 13px;
+  line-height: 1.5;
+  box-shadow: var(--shadow);
+  max-width: 240px;
+}
+
+.pf-tip .d {
+  font: 11px var(--mono);
+  opacity: 0.75;
+}
+
+.pf-tip .row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pf-tip .row i {
+  width: 12px;
+  height: 2px;
+  background: var(--c);
+  flex: none;
+}
+
+.pf-tip .row b {
+  font: 500 13px var(--mono);
+}
+
+.pf-tip .row span {
+  opacity: 0.8;
+}
+
+details.pf-table summary {
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--ink-2);
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+}
+
+.pf-scroll {
+  overflow-x: auto;
+}
+
+table.pf {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+table.pf th,
+table.pf td {
+  padding: 8px 6px;
+  border-bottom: 1px solid var(--rule);
+  text-align: right;
+  white-space: nowrap;
+}
+
+table.pf th:first-child,
+table.pf td:first-child {
+  text-align: left;
+}
+
+table.pf th {
+  font-weight: 500;
+  font-size: 12px;
+  color: var(--ink-2);
+}
+
+/* ---------- 配置 ---------- */
+
+.pf-alloc {
+  display: grid;
+  gap: 10px;
+  margin: 6px 0 4px;
+}
+
+.pf-alloc .row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2px 10px;
+  font-size: 14px;
+}
+
+.pf-alloc .bar {
+  grid-column: 1 / -1;
+  height: 8px;
+  background: var(--paper-2);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.pf-alloc .bar i {
+  display: block;
+  height: 100%;
+  background: var(--s1);
+  border-radius: 4px;
+}
+
+.pf-alloc .row.cash .bar i {
+  background: var(--ink-3);
+}
+
+/* ---------- 持股 ---------- */
+
+.pf-holdings {
+  display: grid;
+  gap: 10px;
+}
+
+@media (min-width: 720px) {
+  .pf-holdings {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.pf-holding {
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 12px;
+  min-width: 0;
+}
+
+.pf-holding header {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: baseline;
+}
+
+.pf-holding h3 {
+  margin: 0;
+  font-size: 17px;
+}
+
+.pf-holding h3 .mono {
+  margin-left: 6px;
+}
+
+.pf-holding dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 12px;
+  margin: 10px 0 0;
+}
+
+.pf-holding dt {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.pf-holding dd {
+  margin: 0;
+  font-size: 14px;
+}
+
+.pf-holding details {
+  margin-top: 10px;
+  border-top: 1px solid var(--rule);
+  padding-top: 4px;
+}
+
+.pf-holding summary {
+  cursor: pointer;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+}
+
+/* ---------- 新聞、晨報、行事曆 ---------- */
+
+.pf-news {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.pf-news a {
+  text-decoration: none;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.pf-news a:hover {
+  color: var(--safelight);
+}
+
+.pf-news .mono {
+  display: block;
+  font-size: 11px;
+}
+
+.pf-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--rule);
+}
+
+.pf-list li {
+  border-bottom: 1px solid var(--rule);
+}
+
+.pf-list a {
+  display: grid;
+  gap: 2px;
+  padding: 12px 0;
+  text-decoration: none;
+  min-height: 44px;
+}
+
+.pf-list a:hover strong {
+  color: var(--safelight);
+}
+
+.pf-article {
+  max-width: 720px;
+  font-size: 16px;
+  line-height: 1.85;
+}
+
+.pf-article h1 {
+  font: 900 clamp(26px, 6vw, 36px) / 1.25 var(--serif);
+  margin: 6px 0 16px;
+}
+
+.pf-article h2 {
+  font: 900 21px/1.4 var(--serif);
+  margin: 28px 0 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--rule);
+}
+
+.pf-article h3 {
+  font-size: 17px;
+  margin: 18px 0 4px;
+}
+
+.pf-article a {
+  color: var(--ink-2);
+  font-size: 13px;
+  text-decoration-color: var(--rule);
+  text-underline-offset: 3px;
+  white-space: nowrap;
+}
+
+.pf-article a:hover {
+  color: var(--safelight);
+}
+
+.pf-article ul {
+  padding-left: 1.2em;
+}
+
+.pf-day-group {
+  margin-bottom: 16px;
+}
+
+.pf-day-group h3 {
+  margin: 0 0 6px;
+  font: 500 13px var(--mono);
+  color: var(--ink-2);
+}
+
+.pf-event {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 2px 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.pf-event .tag {
+  grid-row: span 2;
+  align-self: start;
+  font: 500 11px var(--mono);
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  padding: 2px 8px;
+  margin-top: 2px;
+}
+
+.pf-event .tag[data-kind="macro"] {
+  border-color: var(--ink);
+}
+
+.pf-event .tag[data-kind="earnings"] {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+}
+
+.pf-event small {
+  color: var(--ink-2);
+  font-size: 13px;
+}
+
+.pf-filter {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}

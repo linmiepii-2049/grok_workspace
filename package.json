@@ -10,10 +10,16 @@
     "db:migrate": "wrangler d1 migrations apply jteam --remote -c infra/wrangler.jsonc",
     "viewer:dev": "wrangler dev -c apps/viewer/wrangler.jsonc --port 8788",
     "viewer:deploy": "wrangler deploy -c apps/viewer/wrangler.jsonc",
-    "viewer:seed": "node apps/viewer/seed.mjs"
+    "viewer:seed": "node apps/viewer/seed.mjs",
+    "portfolio": "node tools/portfolio/run.mjs",
+    "test:portfolio": "node --test tools/portfolio/ledger.test.mjs"
   },
   "devDependencies": {
     "hyperframes": "0.8.212",
-    "wrangler": "4.54.0"
+    "wrangler": "4.54.0",
+    "yaml": "2.8.1"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "0.133.0"
   }
 }
