@@ -1,6 +1,13 @@
 # Tristan Reels
 
-字卡短影音（9:16）。每集只寫 `episode.json`，畫面由 `kit/` 的元件組成；旁白用 MiniMax（`Chinese_casual_instructor_nv1`）。
+字卡短影音（9:16）。每集只寫 `episode.json`，畫面由 `kit/` 的元件組成。
+
+## 系列預設（2026-10-29 第 1 支定案）
+
+- 旁白：MiniMax `Chinese_casual_instructor_nv1`、`speech-2.8-hd`，`voice_settings.speed: 1.2`
+- 句間停頓 0.18 秒（`vo-timeline.mjs --gap 0.18`）；片尾 CTA 停 2 秒
+- 不放背景音樂，只有內建音效
+- 長度約 35～40 秒
 
 ## 一集的資料夾
 
@@ -17,8 +24,10 @@
 1. 寫 `voiceover.json` 和 `episode.json`
 2. `node reels/kit/build.mjs reels/<集>`：沒有旁白時用字數估算時間，先看畫面
 3. 推上 `voiceover.json`，GitHub Actions 的 `tts` workflow 產生旁白並 commit 回來；`git pull --rebase`
-4. `node .claude/skills/motion-video/scripts/vo-timeline.mjs <集>/voiceover.json --max 14`，再跑一次 build.mjs，動畫自動對齊真實旁白
-5. 自檢、渲染照 motion-video skill
+4. `node .claude/skills/motion-video/scripts/vo-timeline.mjs <集>/voiceover.json --max 14 --gap 0.18`，再跑一次 build.mjs，動畫自動對齊真實旁白
+5. 自檢照 motion-video skill（`qa.sh <集>/9x16`、`snapshot --review`）
+6. 正式版：`render-all.sh` 只認 `video/`，這裡手動跑：在 `<集>/9x16` 執行 `npx hyperframes render . -o ../../../outputs/video/reels-<集>-9x16.mp4 --fps 30 --quality delivery`，再照 render-all.sh 的兩段式 loudnorm 調到 -14 LUFS
+7. `npm run jt -- archive` 直傳 R2（需要環境變數 `CLOUDFLARE_API_TOKEN`），commit 產生的 `.r2.json`
 
 ## 場景元件（`kit/scenes/`）
 
