@@ -58,7 +58,7 @@ jteam-viewer：/portfolio（沿用 Cloudflare Access 登入）
 
 | 時間             | 執行                                  |
 | ---------------- | ------------------------------------- |
-| 週一～五 14:30   | snapshot（台股收盤）                  |
+| 週一～五 16:00   | snapshot（台股收盤、FinMind 更新後）  |
 | 週二～六 06:00   | snapshot＋events＋brief（美股收盤後） |
 | 推上 ledger.yaml | snapshot                              |
 

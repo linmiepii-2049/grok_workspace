@@ -4,7 +4,7 @@ name: portfolio
 # 晨報 md 由這裡 commit 回 main；GITHUB_TOKEN 的 push 不會觸發 archive.yml，所以在這裡直接歸檔
 on:
   schedule:
-    - cron: "30 6 * * 1-5" # 台北週一～五 14:30：台股收盤後，只重算快照
+    - cron: "0 8 * * 1-5" # 台北週一～五 16:00：台股收盤、FinMind 更新後，只重算快照
     - cron: "0 22 * * 1-5" # 台北週二～六 06:00：美股收盤後，快照＋行事曆＋晨報
   push:
     branches: [main]
@@ -66,6 +66,8 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
+          # 還沒有收盤資料時不會產生晨報，資料夾可能不存在
+          [ -d projects/2026-10-portfolio/outputs/briefs ] || { echo "沒有晨報"; exit 0; }
           git add projects/2026-10-portfolio/outputs/briefs
           git diff --cached --quiet && { echo "沒有新的晨報"; exit 0; }
           git config user.name "github-actions[bot]"
