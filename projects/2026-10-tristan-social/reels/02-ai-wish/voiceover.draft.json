@@ -1,0 +1,48 @@
+{
+  "provider": "minimax",
+  "voice_id": "Chinese_casual_instructor_nv1",
+  "model_id": "speech-2.8-hd",
+  "language_boost": "Chinese",
+  "voice_settings": {
+    "speed": 1.2
+  },
+  "output_dir": "9x16/assets/audio/vo",
+  "lines": [
+    {
+      "id": "h-01",
+      "text": "如果 AI 只能幫你做一件事，你最想丟給它什麼？"
+    },
+    {
+      "id": "h-02",
+      "text": "寫週報、整理 Excel、回客訴信，還是做簡報？"
+    },
+    {
+      "id": "a-01",
+      "text": "留言告訴我，我挑三個，做成影片教你。"
+    },
+    {
+      "id": "t-01",
+      "text": "在那之前，先送你一招萬用的。"
+    },
+    {
+      "id": "t-02",
+      "text": "不知道怎麼問，就叫 AI 先問你。"
+    },
+    {
+      "id": "t-03",
+      "text": "像這樣：幫我規劃部門尾牙，開始前，先問我三個問題。"
+    },
+    {
+      "id": "r-01",
+      "text": "它問的，常常就是你自己還沒想清楚的地方。"
+    },
+    {
+      "id": "j-01",
+      "text": "AI 能做的事很多，但哪件交給它、哪件留給自己，是你的判斷。"
+    },
+    {
+      "id": "c-01",
+      "text": "留言「指令」，加上你最想交給 AI 的事，我私訊送你三十招指令包。"
+    }
+  ]
+}
