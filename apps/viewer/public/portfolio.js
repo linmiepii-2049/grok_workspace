@@ -430,7 +430,7 @@ function overview() {
     <div class="pf-stats">
       ${stat("累積損益", move(profit, twd(profit, { sign: true })), "未實現＋已實現＋股利利息")}
       ${stat("報酬率（TWR）", move(last.twr, pct(last.twr)), `起始日 ${s[0].date} 至今`)}
-      ${stat("未實現損益", move(last.unrealized, twd(last.unrealized, { sign: true })), `持股成本 ${twd(last.cost)}`)}
+      ${stat("未實現損益", move(last.unrealized, twd(last.unrealized, { sign: true })), `持股成本 ${twd(last.cost)} · 已扣預估賣出費用`)}
       ${stat("已實現＋股利", move(last.realized_cum + last.income_cum, twd(last.realized_cum + last.income_cum, { sign: true })), `美元匯率 ${last.fx_usd}`)}
     </div>
     <section class="pf-card">
@@ -466,6 +466,7 @@ function allocBars(rows, total) {
 }
 
 // 各市場用自己的幣別：市值、今日漲跌、未實現（美股只算股價部分，匯率影響只反映在台幣總資產）
+// 未實現扣掉預估賣出手續費與證交稅（sell_cost，原幣），和券商的「參考損益」一致
 const MARKET = {
   TWD: { title: "台股", unit: "元", fmt: (n, o) => twd(n, o), short: (n, o) => twd(n, o) },
   USD: { title: "美股", unit: "美元", fmt: (n, o) => usd(n, o), short: (n, o) => usd(n, { ...o, cents: false }) },
@@ -479,13 +480,14 @@ function marketSection(ccy, cash) {
       ...p,
       mv: p.shares * p.close,
       costN: p.shares * p.avg_cost,
+      sellN: p.sell_cost ?? 0,
       dayN: p.prev_close == null ? null : p.shares * (p.close - p.prev_close),
     }))
     .sort((a, b) => b.mv - a.mv);
   if (!ps.length && !cash) return "";
   const mv = ps.reduce((s, p) => s + p.mv, 0);
   const cost = ps.reduce((s, p) => s + p.costN, 0);
-  const unreal = mv - cost;
+  const unreal = mv - ps.reduce((s, p) => s + p.sellN, 0) - cost;
   const known = ps.filter((p) => p.dayN != null);
   const day = known.length ? known.reduce((s, p) => s + p.dayN, 0) : null;
   const dayBase = known.reduce((s, p) => s + p.shares * p.prev_close, 0);
@@ -505,7 +507,7 @@ function marketSection(ccy, cash) {
       <tbody>${ps
         .map((p) => {
           const chg = p.prev_close ? p.close / p.prev_close - 1 : null;
-          const u = p.mv - p.costN;
+          const u = p.mv - p.sellN - p.costN;
           return `<tr>
             <td>${esc(p.name)}<br><span class="mono">${esc(p.symbol.replace(/\.TWO?$/, ""))}</span></td>
             <td class="num">${m.short(p.mv)}</td>

@@ -1,5 +1,6 @@
 // 讀取 ledger.yaml，依時間重播每筆交易，算出每天的資產快照與已實現損益
 // 金額一律換算台幣；成本用平均成本法（和台灣券商 App 一致）
+// 未實現損益扣掉今天全部賣出的預估手續費與證交稅，和券商的「參考損益」一致
 import { readFileSync } from "node:fs";
 import { parse } from "yaml";
 
@@ -238,6 +239,7 @@ export function computeSnapshots({ ledger, prices, fx, dates, bench = {}, names 
     const usd = needRate(date);
     let marketValue = 0;
     let cost = 0;
+    let unrealizedSum = 0;
     const positions = [];
     for (const h of holdings.values()) {
       const close = priceAt[h.symbol]?.(date);
@@ -246,16 +248,18 @@ export function computeSnapshots({ ledger, prices, fx, dates, bench = {}, names 
       const r = cur === "TWD" ? 1 : usd;
       const mvNative = h.shares * close;
       const mv = mvNative * r;
-      const unrealized = mv - h.costTwd;
-      const unrealPrice = (mvNative - h.costNative) * r;
+      const sellCost = defaultFee(h.symbol, mvNative) + defaultSellTax(h.symbol, mvNative);
+      const unrealized = mv - sellCost * r - h.costTwd;
+      const unrealPrice = (mvNative - sellCost - h.costNative) * r;
       const prevClose = prev?.closes[h.symbol];
       marketValue += mv;
       cost += h.costTwd;
+      unrealizedSum += unrealized;
       positions.push({
         symbol: h.symbol, name: names[h.symbol] ?? h.symbol, account: h.account, currency: cur,
         shares: h.shares, close, prev_close: prevClose ?? null,
         avg_cost: round2(h.costNative / h.shares), market_value: round2(mv), cost: round2(h.costTwd),
-        unrealized: round2(unrealized), unreal_price: round2(unrealPrice), unreal_fx: round2(unrealized - unrealPrice),
+        sell_cost: sellCost, unrealized: round2(unrealized), unreal_price: round2(unrealPrice), unreal_fx: round2(unrealized - unrealPrice),
       });
     }
 
@@ -279,7 +283,7 @@ export function computeSnapshots({ ledger, prices, fx, dates, bench = {}, names 
 
     const snap = {
       date, total: round2(total), market_value: round2(marketValue), cash: round2(cash), cost: round2(cost),
-      unrealized: round2(marketValue - cost), realized_cum: round2(realizedCum), income_cum: round2(incomeCum),
+      unrealized: round2(unrealizedSum), realized_cum: round2(realizedCum), income_cum: round2(incomeCum),
       cash_by_ccy: { TWD: round2(cashByCcy.TWD), USD: round2(cashByCcy.USD) },
       net_flow: round2(netFlow), twr: Math.round((twrIndex - 1) * 1e6) / 1e6, bench: benchRet, positions, fx_usd: usd,
     };
