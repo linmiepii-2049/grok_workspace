@@ -66,6 +66,9 @@
     display: grid; place-items: center;
     font-family: var(--f-title); font-weight: 200; font-size: 230px; color: var(--bg);
   }
+  .t-cover.has-photo .blob { left: -240px; top: -260px; width: 680px; height: 680px; }
+  .t-cover .photo { left: 190px; top: 90px; width: 500px; height: 500px; border-radius: 50%; overflow: hidden; }
+  .t-cover .photo img, .avatar img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) contrast(1.05); }
   .t-cover .vert { right: 96px; top: 110px; writing-mode: vertical-rl; font-size: 22px; color: var(--coral); }
   .t-cover .frame { justify-content: flex-end; }
   .t-cover .series { font-size: calc(var(--k) * 34px); font-weight: 500; color: var(--teal); letter-spacing: .08em; margin-bottom: 36px; }
@@ -114,14 +117,13 @@
 
   /* cta */
   .t-cta .frame { align-items: center; justify-content: center; text-align: center; }
-  .avatar { position: relative; width: 300px; height: 300px; margin-bottom: 64px; flex: none; }
+  .avatar { position: relative; width: 380px; height: 380px; margin-bottom: 64px; flex: none; }
   .avatar .ring { position: absolute; inset: 0; }
   .avatar .in {
-    position: absolute; inset: 42px; border-radius: 50%; background: var(--teal);
+    position: absolute; inset: 30px; border-radius: 50%; background: var(--teal);
     display: grid; place-items: center; overflow: hidden;
     font-family: var(--f-latin); font-weight: 700; font-size: 96px; color: var(--bg);
   }
-  .avatar img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1); }
   .t-cta .title { font-size: calc(var(--k) * 96px); }
   .t-cta .body { margin-top: 40px; }
   .btn { margin-top: 56px; background: var(--coral); color: #fff; font-size: calc(var(--k) * 40px); font-weight: 500; padding: 26px 64px; border-radius: 999px; letter-spacing: .08em; }
@@ -141,7 +143,7 @@ const arrows = colors => `<div class="arrows">${colors.map(c => `<i style="color
 const LAYOUTS = {
   cover: (s, p) => `
     <div class="deco blob"></div>
-    <div class="deco emblem">${esc(p.emblem || '')}</div>
+    ${s.photo ? `<div class="deco photo"><img src="${esc(s.photo)}"></div>` : `<div class="deco emblem">${esc(p.emblem || '')}</div>`}
     <div class="deco vert latin">NO.${esc(p.no)}</div>
     <div class="deco dots" style="right:96px;top:520px;width:132px;height:132px;color:var(--coral)"></div>
     <div class="deco lines" style="left:560px;top:430px;width:200px;color:var(--apricot)"></div>
@@ -239,7 +241,7 @@ window.render = (theme, post) => {
     const layout = LAYOUTS[sl.type];
     if (!layout) throw new Error(`第 ${i + 1} 張：沒有「${sl.type}」這種版型`);
     const last = i === n - 1;
-    return `<section class="slide t-${sl.type}">
+    return `<section class="slide t-${sl.type}${sl.photo ? ' has-photo' : ''}">
       ${layout(sl, post, theme)}
       <footer>
         <div class="latin">${esc(post.seriesEn || '')}</div>

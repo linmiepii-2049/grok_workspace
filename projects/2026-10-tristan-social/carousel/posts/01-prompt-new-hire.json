@@ -6,6 +6,7 @@
   "slides": [
     {
       "type": "cover",
+      "photo": "assets/01-prompt-new-hire.jpg",
       "title": "Prompt 就像\n**交代新人**做事",
       "sub": "講越清楚，AI 做得越好"
     },
