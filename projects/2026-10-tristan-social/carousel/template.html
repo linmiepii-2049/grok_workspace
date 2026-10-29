@@ -66,9 +66,10 @@
     display: grid; place-items: center;
     font-family: var(--f-title); font-weight: 200; font-size: 230px; color: var(--bg);
   }
-  .t-cover.has-photo .blob { left: -240px; top: -260px; width: 680px; height: 680px; }
-  .t-cover .photo { left: 190px; top: 90px; width: 500px; height: 500px; border-radius: 50%; overflow: hidden; }
-  .t-cover .photo img, .avatar img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) contrast(1.05); }
+  /* 封面照片填進綠色圓，只鋪在畫面看得到的那一塊，主角才不會被裁掉 */
+  .t-cover .blob { overflow: hidden; }
+  .t-cover .blob img { position: absolute; left: 200px; top: 220px; width: 560px; height: 540px; object-fit: cover; filter: grayscale(1) contrast(1.05); }
+  .avatar img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) contrast(1.05); }
   .t-cover .vert { right: 96px; top: 110px; writing-mode: vertical-rl; font-size: 22px; color: var(--coral); }
   .t-cover .frame { justify-content: flex-end; }
   .t-cover .series { font-size: calc(var(--k) * 34px); font-weight: 500; color: var(--teal); letter-spacing: .08em; margin-bottom: 36px; }
@@ -142,8 +143,8 @@ const arrows = colors => `<div class="arrows">${colors.map(c => `<i style="color
 
 const LAYOUTS = {
   cover: (s, p) => `
-    <div class="deco blob"></div>
-    ${s.photo ? `<div class="deco photo"><img src="${esc(s.photo)}"></div>` : `<div class="deco emblem">${esc(p.emblem || '')}</div>`}
+    <div class="deco blob">${s.photo ? `<img src="${esc(s.photo)}">` : ''}</div>
+    ${s.photo ? '' : `<div class="deco emblem">${esc(p.emblem || '')}</div>`}
     <div class="deco vert latin">NO.${esc(p.no)}</div>
     <div class="deco dots" style="right:96px;top:520px;width:132px;height:132px;color:var(--coral)"></div>
     <div class="deco lines" style="left:560px;top:430px;width:200px;color:var(--apricot)"></div>
@@ -241,7 +242,7 @@ window.render = (theme, post) => {
     const layout = LAYOUTS[sl.type];
     if (!layout) throw new Error(`第 ${i + 1} 張：沒有「${sl.type}」這種版型`);
     const last = i === n - 1;
-    return `<section class="slide t-${sl.type}${sl.photo ? ' has-photo' : ''}">
+    return `<section class="slide t-${sl.type}">
       ${layout(sl, post, theme)}
       <footer>
         <div class="latin">${esc(post.seriesEn || '')}</div>
