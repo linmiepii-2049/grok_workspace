@@ -26,8 +26,11 @@
 3. 推上 `voiceover.json`，GitHub Actions 的 `tts` workflow 產生旁白並 commit 回來；`git pull --rebase`
 4. `node .claude/skills/motion-video/scripts/vo-timeline.mjs <集>/voiceover.json --max 14 --gap 0.18`，再跑一次 build.mjs，動畫自動對齊真實旁白
 5. 自檢照 motion-video skill（`qa.sh <集>/9x16`、`snapshot --review`）
-6. 正式版：`render-all.sh` 只認 `video/`，這裡手動跑：在 `<集>/9x16` 執行 `npx hyperframes render . -o ../../../outputs/video/reels-<集>-9x16.mp4 --fps 30 --quality delivery`，再照 render-all.sh 的兩段式 loudnorm 調到 -14 LUFS
-7. `npm run jt -- archive` 直傳 R2（需要環境變數 `CLOUDFLARE_API_TOKEN`），commit 產生的 `.r2.json`
+6. 正式版：觸發 GitHub Actions 的 `render` workflow（雲端 session 沒有 Cloudflare 密鑰，不在 session 內渲染歸檔），輸入
+   - `dir`：`projects/2026-10-tristan-social/reels/<集>/9x16`
+   - `output`：`projects/2026-10-tristan-social/outputs/video/reels-<集>-9x16.mp4`
+
+   它會渲染、調到 -14 LUFS、歸檔到 R2，再把 `.r2.json` commit 回來；`git pull --rebase` 拉回來即可
 
 ## 場景元件（`kit/scenes/`）
 
