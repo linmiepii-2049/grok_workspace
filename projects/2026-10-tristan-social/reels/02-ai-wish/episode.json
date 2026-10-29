@@ -13,6 +13,7 @@
       "type": "comment-wall",
       "lines": ["h-01", "h-02", "a-01"],
       "title": "你想交給 AI\n**哪件事**？",
+      "peep": "phone",
       "comments": [
         { "name": "小美", "text": "寫週報", "line": "h-02", "at": "寫週報" },
         { "name": "阿哲", "text": "整理 Excel", "line": "h-02", "at": "整理" },
@@ -29,6 +30,7 @@
       "type": "title-card",
       "lines": ["t-01", "t-02"],
       "kicker": "先送你一招",
+      "peep": "idea",
       "kickerAt": "先送",
       "title": "不知道怎麼問\n叫 AI **先問你**",
       "titleAt": "不知道"

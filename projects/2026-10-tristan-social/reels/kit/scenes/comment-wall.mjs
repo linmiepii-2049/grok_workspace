@@ -1,6 +1,7 @@
 // 互動鉤子：大標問題，下面留言一則一則彈進來，最後大標換成一張便利貼（承諾）
 // props: title, comments: [{ name, text, line, at }]（兩欄排列，最多 6 則）, note, noteLine, noteAt
-import { em, esc, mv } from "../lib.mjs";
+//        peep（選填，kit/peeps/ 的人物名）：封面時站在留言區，第一則留言彈出前退場
+import { em, esc, mv, peep } from "../lib.mjs";
 
 export default ({ props, ctx }) => {
   const colX = [80, 560], rowY = [610, 770, 930];
@@ -14,10 +15,16 @@ export default ({ props, ctx }) => {
   </div>`,
     )
     .join("")}
+  ${props.peep ? peep("w-peep", props.peep, { left: 356, top: 600, h: 520 }) : ""}
   <div id="w-note" class="abs" style="left:220px;top:330px;width:640px;padding:30px 0;text-align:center;background:var(--teal-deep);color:#fff;font:500 52px/1 var(--zh);letter-spacing:.06em;box-shadow:0 16px 36px rgba(58,56,54,.18)">${esc(props.note)}</div>`;
 
   // 第 0 格就有大標，當封面
   const js = [];
+  if (props.peep) {
+    const first = Math.min(...props.comments.map((c) => ctx.at(c.line, c.at))) - 0.45;
+    js.push(mv.bob("#w-peep", 0, first));
+    js.push(`tl.to("#w-peep", { y: 120, opacity: 0, duration: 0.3, ease: "power2.in" }, ${first.toFixed(3)});`);
+  }
   props.comments.forEach((c, i) => {
     const t = ctx.at(c.line, c.at) - 0.1;
     js.push(mv.pop(`#w-c${i}`, t, 0.35));

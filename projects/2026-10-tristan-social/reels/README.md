@@ -46,6 +46,7 @@
 | `title-card`   | 轉場大標：小字引言＋大標                   | kicker、title                               |
 | `sort-split`   | 人的判斷：卡片分成左右兩欄                 | left、right（head、at、items）、title       |
 
+- 人物插圖：Open Peeps（CC0，不用標示來源），`kit/peeps/<name>.svg`。場景加 `"peep": "<name>"`（目前 `comment-wall`、`title-card` 支援）；一集最多 2 處，放在畫面有空、需要人味的地方。新增人物：改 `kit/peeps/peeps.json`，照 `kit/peeps/gen.cjs` 開頭的說明產生
 - 時間欄位都寫成「旁白裡的某個詞」（例如 `"titleAt": "問題"`），build.mjs 換算成秒數；換聲音、改稿都不用手改時間
 - `**重點**` 會變成磚紅強調色；每個畫面只用一處
 - 新元件：在 `kit/scenes/` 加一個檔案，動態只用 `kit/lib.mjs` 的 `mv`（打字、遮罩揭開、手繪線、蓋章、彈出、數字跳動），不要每集重寫 GSAP

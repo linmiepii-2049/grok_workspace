@@ -1,0 +1,8 @@
+{
+  "phone": { "body": "Device", "face": "Smile", "hair": "ShortVolumed" },
+  "idea": { "body": "PointingUp", "face": "SmileBig", "hair": "Bun" },
+  "explain": { "body": "Explaining", "face": "Explaining", "hair": "Medium" },
+  "paper": { "body": "Paper", "face": "Calm", "hair": "GrayShort" },
+  "coffee": { "body": "Coffee", "face": "Cheeky", "hair": "LongBangs" },
+  "doubt": { "body": "ArmsCrossed", "face": "Suspicious", "hair": "Pomp" }
+}
