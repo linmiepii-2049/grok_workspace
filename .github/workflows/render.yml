@@ -1,0 +1,84 @@
+name: render
+
+# 雲端 session 不持有 Cloudflare 密鑰，渲染好的影片又不進 git，session 內歸檔不了。
+# 這裡從 git 裡的 HyperFrames 專案渲染正式版、調整響度，再用 GitHub Secrets 歸檔到 R2，把 .r2.json 指標檔 commit 回來
+on:
+  workflow_dispatch:
+    inputs:
+      dir:
+        description: HyperFrames 專案資料夾，例如 projects/2026-10-tristan-social/reels/01-prompt-new-hire/9x16
+        required: true
+      output:
+        description: 成品路徑，要在 projects/<專案>/outputs/ 底下，例如 projects/2026-10-tristan-social/outputs/video/reels-01-prompt-new-hire-9x16.mp4
+        required: true
+      fps:
+        description: 影格率
+        default: "30"
+
+concurrency:
+  group: archive # 和 archive workflow 共用，避免歸檔版本號競爭
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    env:
+      DIR: ${{ inputs.dir }}
+      OUTPUT: ${{ inputs.output }}
+      FPS: ${{ inputs.fps }}
+      HYPERFRAMES_NO_TELEMETRY: "1"
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: 檢查輸入
+        run: |
+          [[ -f "$DIR/index.html" ]] || { echo "::error::找不到 $DIR/index.html"; exit 1; }
+          [[ "$OUTPUT" =~ ^projects/[^/]+/outputs/.+\.mp4$ && "$OUTPUT" != *..* ]] || { echo "::error::output 要是 projects/<專案>/outputs/ 底下的 .mp4"; exit 1; }
+          [[ "$FPS" =~ ^[0-9]+$ ]] || { echo "::error::fps 要是數字"; exit 1; }
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+
+      - name: 渲染
+        run: |
+          mkdir -p "$(dirname "$OUTPUT")"
+          npx hyperframes render "$DIR" -o "$PWD/$OUTPUT" --fps "$FPS" --quality delivery
+
+      # 和 motion-video 的 render-all.sh 相同：兩段式 loudnorm 到 -14 LUFS、峰值 -1 dBTP，影像不重新編碼
+      - name: 調整響度
+        run: |
+          if ffprobe -v error -select_streams a -show_entries stream=index -of csv=p=0 "$OUTPUT" | grep -q .; then
+            stats="$(ffmpeg -nostats -i "$OUTPUT" -af loudnorm=I=-14:TP=-1:LRA=11:print_format=json -f null - 2>&1 | sed -n '/^{/,/^}/p')"
+            get() { echo "$stats" | sed -nE "s/.*\"$1\" : \"([^\"]+)\".*/\1/p"; }
+            ln="loudnorm=I=-14:TP=-1:LRA=11:measured_I=$(get input_i):measured_TP=$(get input_tp):measured_LRA=$(get input_lra):measured_thresh=$(get input_thresh):offset=$(get target_offset):linear=true"
+            ffmpeg -v error -y -i "$OUTPUT" -c:v copy -af "$ln" -ar 48000 -c:a aac -b:a 192k "$OUTPUT.norm.mp4"
+            mv "$OUTPUT.norm.mp4" "$OUTPUT"
+          fi
+          size="$(ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 "$OUTPUT")"
+          dur="$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$OUTPUT")"
+          lufs="$(ffmpeg -nostats -i "$OUTPUT" -af ebur128 -f null - 2>&1 | awk '/I:/ { v = $2 } END { print v }')"
+          echo "成品：$OUTPUT（${dur}s，$size，${lufs:-無音軌} LUFS）" | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: 歸檔到 R2 / D1
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: npm run jt -- archive
+
+      - name: commit 指標檔回分支
+        run: |
+          git add -A projects
+          git diff --cached --quiet && { echo "沒有新的指標檔"; exit 0; }
+          git config user.name "github-actions[bot]"
+          git config user.email "41898+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore(render): 歸檔 $(basename "$OUTPUT")"
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
