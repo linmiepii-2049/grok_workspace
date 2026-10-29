@@ -259,7 +259,9 @@ export function computeSnapshots({ ledger, prices, fx, dates, bench = {}, names 
       });
     }
 
-    const cash = [...accounts.values()].reduce((s, a) => s + a.cash * (a.currency === "TWD" ? 1 : usd), 0);
+    const cashByCcy = { TWD: 0, USD: 0 };
+    for (const a of accounts.values()) cashByCcy[a.currency] += a.cash;
+    const cash = cashByCcy.TWD + cashByCcy.USD * usd;
     const total = marketValue + cash;
     // 時間加權報酬：當天的入金出金視為發生在收盤前，不算進報酬
     if (prev && prev.total > 0) twrIndex *= (total - netFlow) / prev.total;
@@ -278,6 +280,7 @@ export function computeSnapshots({ ledger, prices, fx, dates, bench = {}, names 
     const snap = {
       date, total: round2(total), market_value: round2(marketValue), cash: round2(cash), cost: round2(cost),
       unrealized: round2(marketValue - cost), realized_cum: round2(realizedCum), income_cum: round2(incomeCum),
+      cash_by_ccy: { TWD: round2(cashByCcy.TWD), USD: round2(cashByCcy.USD) },
       net_flow: round2(netFlow), twr: Math.round((twrIndex - 1) * 1e6) / 1e6, bench: benchRet, positions, fx_usd: usd,
     };
     snapshots.push(snap);

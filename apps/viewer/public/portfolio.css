@@ -550,3 +550,38 @@ table.pf th {
   gap: 8px;
   margin-bottom: 14px;
 }
+
+@media (max-width: 520px) {
+  .pf-market table.pf {
+    font-size: 13px;
+  }
+
+  .pf-market table.pf th,
+  .pf-market table.pf td {
+    padding: 8px 3px;
+  }
+
+  /* 占比欄在窄螢幕隱藏，配置比例看上方「資產配置」 */
+  .pf-market table.pf th:last-child,
+  .pf-market table.pf td:last-child {
+    display: none;
+  }
+}
+
+/* 漲跌符號和數字不拆行；名稱欄可換行，讓表格塞進手機寬度 */
+.up,
+.down {
+  white-space: nowrap;
+}
+
+table.pf td:first-child {
+  white-space: normal;
+  overflow-wrap: break-word;
+  min-width: 6em;
+}
+
+@media (max-width: 520px) {
+  .pf-stat .value {
+    font-size: 16px;
+  }
+}

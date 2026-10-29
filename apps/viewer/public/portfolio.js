@@ -22,6 +22,15 @@ const pct = (n, { sign = true } = {}) =>
   n == null
     ? "—"
     : `${n < 0 ? "−" : sign && n > 0 ? "+" : ""}${Math.abs(n * 100).toFixed(2)}%`;
+const usd = (n, { sign = false, cents = true } = {}) => {
+  if (n == null) return "—";
+  const d = cents ? 2 : 0;
+  const s = Math.abs(n).toLocaleString("en-US", {
+    minimumFractionDigits: d,
+    maximumFractionDigits: d,
+  });
+  return `${n < 0 ? "−" : sign && n > 0 ? "+" : ""}$${s}`;
+};
 const qty = (n) =>
   Number(n).toLocaleString("zh-TW", { maximumFractionDigits: 4 });
 const px = (n) =>
@@ -357,16 +366,18 @@ function overview() {
   const profit = last.unrealized + last.realized_cum + last.income_cum;
   const dates = s.map((r) => r.date);
 
-  const cash = {
-    symbol: "現金",
-    name: "現金",
-    market_value: last.cash,
-    weight: last.total ? last.cash / last.total : 0,
-    cash: true,
-  };
-  const alloc = [...summary.positions, cash].sort(
-    (a, b) => b.market_value - a.market_value,
-  );
+  // 大類配置：台股、美股、台幣現金、美元現金（台幣計價）
+  const cashCcy = summary.cash_by_ccy ?? {};
+  const mvOf = (ccy) =>
+    summary.positions
+      .filter((p) => p.currency === ccy)
+      .reduce((sum, p) => sum + p.market_value, 0);
+  const alloc = [
+    { name: "台股", value: mvOf("TWD") },
+    { name: "美股", value: mvOf("USD") },
+    { name: "台幣現金", value: cashCcy.TWD ?? 0, cash: true },
+    { name: "美元現金", value: (cashCcy.USD ?? 0) * last.fx_usd, cash: true },
+  ].filter((a) => a.value > 0);
 
   const charts =
     s.length < 2
@@ -422,21 +433,91 @@ function overview() {
       ${stat("未實現損益", move(last.unrealized, twd(last.unrealized, { sign: true })), `持股成本 ${twd(last.cost)}`)}
       ${stat("已實現＋股利", move(last.realized_cum + last.income_cum, twd(last.realized_cum + last.income_cum, { sign: true })), `美元匯率 ${last.fx_usd}`)}
     </div>
-    ${charts}
     <section class="pf-card">
       <h2>資產配置</h2>
-      <div class="pf-alloc">
-        ${alloc
-          .map(
-            (p) => `<div class="row${p.cash ? " cash" : ""}">
-              <span>${esc(p.name)}${p.cash ? "" : ` <span class="mono">${esc(p.symbol)}</span>`}</span>
-              <span class="num">${(p.weight * 100).toFixed(1)}%　${twd(p.market_value)}</span>
-              <span class="bar"><i style="width:${Math.max(0.5, p.weight * 100)}%"></i></span>
-            </div>`,
-          )
-          .join("")}
-      </div>
-    </section>`;
+      <p class="hint">台幣計價，美元匯率 ${last.fx_usd}</p>
+      ${allocBars(
+        alloc.map((a) => ({
+          label: esc(a.name),
+          value: a.value,
+          valueText: `${twd(a.value)} 元`,
+          cash: a.cash,
+        })),
+        last.total,
+      )}
+    </section>
+    ${marketSection("TWD", cashCcy.TWD ?? 0)}
+    ${marketSection("USD", cashCcy.USD ?? 0)}
+    ${charts}`;
+}
+
+// 配置長條：weight 以 total 為分母
+function allocBars(rows, total) {
+  return `<div class="pf-alloc">${rows
+    .map((r) => {
+      const w = total ? r.value / total : 0;
+      return `<div class="row${r.cash ? " cash" : ""}">
+        <span>${r.label}</span>
+        <span class="num">${(w * 100).toFixed(1)}%　${r.valueText}</span>
+        <span class="bar"><i style="width:${Math.max(0.5, w * 100)}%"></i></span>
+      </div>`;
+    })
+    .join("")}</div>`;
+}
+
+// 各市場用自己的幣別：市值、今日漲跌、未實現（美股只算股價部分，匯率影響只反映在台幣總資產）
+const MARKET = {
+  TWD: { title: "台股", unit: "元", fmt: (n, o) => twd(n, o), short: (n, o) => twd(n, o) },
+  USD: { title: "美股", unit: "美元", fmt: (n, o) => usd(n, o), short: (n, o) => usd(n, { ...o, cents: false }) },
+};
+
+function marketSection(ccy, cash) {
+  const m = MARKET[ccy];
+  const ps = summary.positions
+    .filter((p) => p.currency === ccy)
+    .map((p) => ({
+      ...p,
+      mv: p.shares * p.close,
+      costN: p.shares * p.avg_cost,
+      dayN: p.prev_close == null ? null : p.shares * (p.close - p.prev_close),
+    }))
+    .sort((a, b) => b.mv - a.mv);
+  if (!ps.length && !cash) return "";
+  const mv = ps.reduce((s, p) => s + p.mv, 0);
+  const cost = ps.reduce((s, p) => s + p.costN, 0);
+  const unreal = mv - cost;
+  const known = ps.filter((p) => p.dayN != null);
+  const day = known.length ? known.reduce((s, p) => s + p.dayN, 0) : null;
+  const dayBase = known.reduce((s, p) => s + p.shares * p.prev_close, 0);
+
+  return `<section class="pf-card pf-market">
+    <h2>${m.title}<span class="mono">　${ccy}</span></h2>
+    <div class="pf-stats">
+      ${stat("市值", `<span class="num">${m.fmt(mv)}</span>`, m.unit)}
+      ${stat("今日", day == null ? "—" : move(day, m.fmt(day, { sign: true })), day == null || !dayBase ? "" : pct(day / dayBase))}
+      ${stat("未實現損益", move(unreal, m.fmt(unreal, { sign: true })), cost ? `${pct(unreal / cost)} · 成本 ${m.fmt(cost)}` : "")}
+      ${stat("現金", `<span class="num">${m.fmt(cash)}</span>`, m.unit)}
+    </div>
+    ${
+      ps.length
+        ? `<div class="pf-scroll"><table class="pf">
+      <thead><tr><th>持股</th><th>市值</th><th>今日</th><th>未實現</th><th>占${m.title}</th></tr></thead>
+      <tbody>${ps
+        .map((p) => {
+          const chg = p.prev_close ? p.close / p.prev_close - 1 : null;
+          const u = p.mv - p.costN;
+          return `<tr>
+            <td>${esc(p.name)}<br><span class="mono">${esc(p.symbol.replace(/\.TWO?$/, ""))}</span></td>
+            <td class="num">${m.short(p.mv)}</td>
+            <td>${move(chg, pct(chg))}</td>
+            <td>${move(u, m.short(u, { sign: true }))}<br><span class="mono">${p.costN ? pct(u / p.costN) : ""}</span></td>
+            <td class="num">${mv ? ((p.mv / mv) * 100).toFixed(1) : "0.0"}%</td>
+          </tr>`;
+        })
+        .join("")}</tbody></table></div>`
+        : ""
+    }
+  </section>`;
 }
 
 const compact = (v) => {

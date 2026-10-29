@@ -57,14 +57,20 @@ export async function fetchNames(symbols) {
   const us = symbols.filter((s) => !isTW(s));
   if (tw.length) {
     const rows = await finmind("TaiwanStockInfo");
-    for (const s of tw) names[s] = rows.find((r) => r.stock_id === twCode(s))?.stock_name ?? s;
+    // FinMind 會在部分名稱後加 *，顯示時去掉
+    for (const s of tw) names[s] = rows.find((r) => r.stock_id === twCode(s))?.stock_name?.replace(/\*+$/, "") ?? s;
   }
   if (us.length) {
     const rows = await finmind("USStockInfo");
     for (const s of us) {
-      // 「NVIDIA Corporation Common Stock」→「NVIDIA」
+      // 「NVIDIA Corporation Common Stock」→「NVIDIA」：反覆去掉公司型態與股份類別尾綴
       const full = rows.find((r) => r.stock_id === s)?.stock_name;
-      names[s] = full ? full.replace(/\s+(Common Stock|Class [A-C].*|Ordinary Shares.*|Inc\.?|Corporation|Corp\.?)(\s.*)?$/i, "").trim() || full : s;
+      let short = full ?? s;
+      for (let prev = ""; prev !== short; ) {
+        prev = short;
+        short = short.replace(/[\s,]+(Common Stock|Class [A-C]\b.*|Ordinary Shares.*|American Depositary Shares.*|Inc\.?|Corporation|Corp\.?|and Company|Company|Co\.?|Group|Holdings|Ltd\.?|A\/S|plc|N\.V\.|S\.A\.)$/i, "").trim();
+      }
+      names[s] = short || full || s;
     }
   }
   return names;

@@ -193,7 +193,7 @@ async function portfolioSummary(env) {
         `SELECT date, total, market_value, cash, cost, unrealized, realized_cum, income_cum, net_flow, twr, bench, fx_usd FROM pf_snapshots ORDER BY date`,
       ).all(),
       env.DB.prepare(
-        `SELECT date, positions FROM pf_snapshots ORDER BY date DESC LIMIT 1`,
+        `SELECT date, positions, cash_by_ccy FROM pf_snapshots ORDER BY date DESC LIMIT 1`,
       ).first(),
       env.DB.prepare(
         `SELECT date, symbol, account, shares, proceeds, cost, pnl, pnl_price, pnl_fx FROM pf_realized ORDER BY date DESC, id DESC`,
@@ -202,6 +202,7 @@ async function portfolioSummary(env) {
   return {
     series: series.map((s) => ({ ...s, bench: JSON.parse(s.bench) })),
     positions: latest ? JSON.parse(latest.positions) : [],
+    cash_by_ccy: latest ? JSON.parse(latest.cash_by_ccy) : {},
     realized,
   };
 }

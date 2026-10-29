@@ -7,6 +7,7 @@ CREATE TABLE pf_snapshots (
   total         REAL NOT NULL,                      -- 總資產 = 市值 + 現金
   market_value  REAL NOT NULL,
   cash          REAL NOT NULL,
+  cash_by_ccy   TEXT NOT NULL DEFAULT '{}' CHECK (json_valid(cash_by_ccy)),  -- 各幣別現金原幣金額 {"TWD": 0, "USD": 0}
   cost          REAL NOT NULL,                      -- 持股成本
   unrealized    REAL NOT NULL,
   realized_cum  REAL NOT NULL,                      -- 起始日至今累積已實現損益
