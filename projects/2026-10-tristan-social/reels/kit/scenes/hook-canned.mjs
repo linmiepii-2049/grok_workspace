@@ -19,7 +19,7 @@ export default ({ props, ctx }) => {
 
   const js = [
     // 第 0 格就有 Prompt 和回覆卡頭，當封面
-    ...props.reply.map((_, i) => mv.wipeRight(`#h-r${i}`, 0.25 + i * 0.16, 0.3)),
+    ...props.reply.map((_, i) => mv.wipeRight(`#h-r${i}`, 0.05 + i * 0.12, 0.25)),
     mv.stamp("#h-stamp", ctx.at(l1, props.stampAt) - 0.05),
     mv.draw("#h-strike path", ctx.t(l2) - 0.05, 0.45),
     mv.dim("#h-reply", ctx.t(l2) + 0.3, 0.4),
