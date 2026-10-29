@@ -102,11 +102,11 @@ em { font-style: normal; color: var(--coral); }
     tl.fromTo("#p-cross path", { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.3, ease: "power2.inOut" }, 0.5);
     tl.fromTo("#p-after-l", { clipPath: "inset(100% 0% 0% 0%)", y: 28 }, { clipPath: "inset(0% 0% 0% 0%)", y: 0, duration: 0.3, ease: "power3.out" }, 0.25);
     tl.fromTo("#p-after", { clipPath: "inset(0% 0% 100% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.5, ease: "power3.out" }, 0.25);
-    tl.fromTo("#p-stat0", { clipPath: "inset(100% 0% 0% 0%)", y: 28 }, { clipPath: "inset(0% 0% 0% 0%)", y: 0, duration: 0.35, ease: "power3.out" }, 0.484);
-    { const el = document.querySelector("#p-num0"); const o = { v: 0 }; tl.fromTo(o, { v: 0 }, { v: 30, duration: 0.5, ease: "power2.out", onUpdate: () => { el.textContent = Math.round(o.v); } }, 0.634); }
-    tl.fromTo("#p-stat1", { clipPath: "inset(100% 0% 0% 0%)", y: 28 }, { clipPath: "inset(0% 0% 0% 0%)", y: 0, duration: 0.35, ease: "power3.out" }, 1.167);
-    { const el = document.querySelector("#p-num1"); const o = { v: 0 }; tl.fromTo(o, { v: 0 }, { v: 3, duration: 0.5, ease: "power2.out", onUpdate: () => { el.textContent = Math.round(o.v); } }, 1.317); }
-    tl.set({}, {}, 3.739);
+    tl.fromTo("#p-stat0", { clipPath: "inset(100% 0% 0% 0%)", y: 28 }, { clipPath: "inset(0% 0% 0% 0%)", y: 0, duration: 0.35, ease: "power3.out" }, 0.384);
+    { const el = document.querySelector("#p-num0"); const o = { v: 0 }; tl.fromTo(o, { v: 0 }, { v: 30, duration: 0.5, ease: "power2.out", onUpdate: () => { el.textContent = Math.round(o.v); } }, 0.534); }
+    tl.fromTo("#p-stat1", { clipPath: "inset(100% 0% 0% 0%)", y: 28 }, { clipPath: "inset(0% 0% 0% 0%)", y: 0, duration: 0.35, ease: "power3.out" }, 0.882);
+    { const el = document.querySelector("#p-num1"); const o = { v: 0 }; tl.fromTo(o, { v: 0 }, { v: 3, duration: 0.5, ease: "power2.out", onUpdate: () => { el.textContent = Math.round(o.v); } }, 1.032); }
+    tl.set({}, {}, 2.964);
     window.__timelines["s4-before-after"] = tl;
   </script>
 </template>

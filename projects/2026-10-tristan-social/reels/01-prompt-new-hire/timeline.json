@@ -1,5 +1,5 @@
 {
-  "total": 42.714,
+  "total": 35.824,
   "maxChars": 14,
   "lines": [
     {
@@ -7,17 +7,17 @@
       "text": "你叫 AI 寫請假信，它給你這種罐頭信？",
       "file": "assets/audio/vo/h-01.mp3",
       "start": 0.3,
-      "duration": 3.474,
+      "duration": 2.952,
       "captions": [
         {
           "text": "你叫 AI 寫請假信",
-          "start": 0.343,
-          "end": 1.665
+          "start": 0.336,
+          "end": 1.509
         },
         {
           "text": "它給你這種罐頭信？",
-          "start": 1.665,
-          "end": 3.774
+          "start": 1.509,
+          "end": 3.252
         }
       ]
     },
@@ -25,18 +25,18 @@
       "id": "h-02",
       "text": "問題通常不在 AI，在你怎麼交代。",
       "file": "assets/audio/vo/h-02.mp3",
-      "start": 4.024,
-      "duration": 2.926,
+      "start": 3.432,
+      "duration": 2.586,
       "captions": [
         {
           "text": "問題通常不在 AI",
-          "start": 4.067,
-          "end": 5.347
+          "start": 3.468,
+          "end": 4.534
         },
         {
           "text": "在你怎麼交代",
-          "start": 5.347,
-          "end": 6.95
+          "start": 4.534,
+          "end": 6.018
         }
       ]
     },
@@ -44,18 +44,18 @@
       "id": "t-01",
       "text": "其實下 Prompt，就跟交代新人做事一樣。",
       "file": "assets/audio/vo/t-01.mp3",
-      "start": 7.2,
-      "duration": 3.605,
+      "start": 6.198,
+      "duration": 2.769,
       "captions": [
         {
           "text": "其實下 Prompt",
-          "start": 7.243,
-          "end": 8.48
+          "start": 6.234,
+          "end": 7.158
         },
         {
           "text": "就跟交代新人做事一樣",
-          "start": 8.48,
-          "end": 10.805
+          "start": 7.158,
+          "end": 8.967
         }
       ]
     },
@@ -63,18 +63,18 @@
       "id": "t-02",
       "text": "新人第一天，你會先跟他講清楚四件事。",
       "file": "assets/audio/vo/t-02.mp3",
-      "start": 11.055,
-      "duration": 3.265,
+      "start": 9.147,
+      "duration": 2.743,
       "captions": [
         {
           "text": "新人第一天",
-          "start": 11.098,
-          "end": 11.823
+          "start": 9.183,
+          "end": 9.787
         },
         {
           "text": "你會先跟他講清楚四件事",
-          "start": 11.823,
-          "end": 14.32
+          "start": 9.787,
+          "end": 11.89
         }
       ]
     },
@@ -82,13 +82,13 @@
       "id": "b-01",
       "text": "第一，角色：你是我的秘書。",
       "file": "assets/audio/vo/b-01.mp3",
-      "start": 14.57,
-      "duration": 2.795,
+      "start": 12.07,
+      "duration": 2.456,
       "captions": [
         {
           "text": "第一　角色　你是我的秘書",
-          "start": 14.613,
-          "end": 17.365
+          "start": 12.106,
+          "end": 14.526
         }
       ]
     },
@@ -96,18 +96,18 @@
       "id": "b-02",
       "text": "第二，背景：週五家裡有事，要請一天。",
       "file": "assets/audio/vo/b-02.mp3",
-      "start": 17.615,
-      "duration": 3.918,
+      "start": 14.706,
+      "duration": 3.396,
       "captions": [
         {
           "text": "第二　背景　週五家裡有事",
-          "start": 17.658,
-          "end": 20.09
+          "start": 14.742,
+          "end": 16.91
         },
         {
           "text": "要請一天",
-          "start": 20.09,
-          "end": 21.533
+          "start": 16.91,
+          "end": 18.102
         }
       ]
     },
@@ -115,18 +115,18 @@
       "id": "b-03",
       "text": "第三，任務：寫一封請假信給主管。",
       "file": "assets/audio/vo/b-03.mp3",
-      "start": 21.783,
-      "duration": 3.788,
+      "start": 18.282,
+      "duration": 2.691,
       "captions": [
         {
           "text": "第三　任務",
-          "start": 21.826,
-          "end": 23.191
+          "start": 18.318,
+          "end": 19.206
         },
         {
           "text": "寫一封請假信給主管",
-          "start": 23.191,
-          "end": 25.571
+          "start": 19.206,
+          "end": 20.973
         }
       ]
     },
@@ -134,18 +134,18 @@
       "id": "b-04",
       "text": "第四，格式：語氣客氣，一百字以內。",
       "file": "assets/audio/vo/b-04.mp3",
-      "start": 25.821,
-      "duration": 3.527,
+      "start": 21.153,
+      "duration": 3.161,
       "captions": [
         {
           "text": "第四　格式　語氣客氣",
-          "start": 25.864,
-          "end": 27.954
+          "start": 21.189,
+          "end": 23.073
         },
         {
           "text": "一百字以內",
-          "start": 27.954,
-          "end": 29.348
+          "start": 23.073,
+          "end": 24.314
         }
       ]
     },
@@ -153,13 +153,13 @@
       "id": "p-01",
       "text": "多寫三十個字，省下來回改三次。",
       "file": "assets/audio/vo/p-01.mp3",
-      "start": 29.598,
-      "duration": 3.239,
+      "start": 24.494,
+      "duration": 2.534,
       "captions": [
         {
           "text": "多寫三十個字　省下來回改三次",
-          "start": 29.641,
-          "end": 32.837
+          "start": 24.53,
+          "end": 27.028
         }
       ]
     },
@@ -167,18 +167,18 @@
       "id": "j-01",
       "text": "不過最後挑哪一版、改哪一句，還是要靠你的眼光。",
       "file": "assets/audio/vo/j-01.mp3",
-      "start": 33.087,
-      "duration": 4.101,
+      "start": 27.208,
+      "duration": 3.683,
       "captions": [
         {
           "text": "不過最後挑哪一版　改哪一句",
-          "start": 33.13,
-          "end": 35.306
+          "start": 27.244,
+          "end": 29.235
         },
         {
           "text": "還是要靠你的眼光",
-          "start": 35.306,
-          "end": 37.188
+          "start": 29.235,
+          "end": 30.891
         }
       ]
     },
@@ -186,18 +186,18 @@
       "id": "c-01",
       "text": "想要三十招直接複製的指令？留言「指令」，我私訊送你。",
       "file": "assets/audio/vo/c-01.mp3",
-      "start": 37.438,
-      "duration": 4.676,
+      "start": 31.071,
+      "duration": 4.153,
       "captions": [
         {
           "text": "想要三十招直接複製的指令？",
-          "start": 37.481,
-          "end": 39.486
+          "start": 31.107,
+          "end": 32.742
         },
         {
           "text": "留言「指令」　我私訊送你",
-          "start": 39.486,
-          "end": 42.114
+          "start": 32.742,
+          "end": 35.224
         }
       ]
     }
