@@ -44,7 +44,8 @@ em { font-style: normal; color: var(--coral); }
 .k-reply-body { font: 300 38px/1.6 var(--zh); letter-spacing: 0.02em; white-space: pre-line; }
 
 /* 大標：思源黑體 Thin 拉長 1.18 倍。GSAP 只動外層，拉長放在內層 */
-.k-title { position: absolute; left: 60px; right: 60px; text-align: center; }
+/* 拉長 1.18 倍會超出排版高度，下方留 0.3em，遮罩動態才不會切掉字腳 */
+.k-title { position: absolute; left: 60px; right: 60px; text-align: center; padding-bottom: 0.3em; font-size: 124px; }
 .k-title .s {
   display: inline-block; transform: scaleY(1.18); transform-origin: 50% 0;
   font: 200 124px/1.12 var(--zh); letter-spacing: 0.04em; white-space: pre-line;
@@ -96,7 +97,7 @@ em { font-style: normal; color: var(--coral); }
 工作我會先安排好，<span id="k-old" style="position:relative;display:inline-block">麻煩您了<svg id="k-oldx" class="k-ink" style="left:-4px;top:46%;width:calc(100% + 8px);height:6px" viewBox="0 0 100 6" preserveAspectRatio="none"><path pathLength="1" d="M0 3 L100 3" style="stroke-width:5"/></svg><span id="k-fix" class="abs" data-layout-allow-overflow style="left:0;top:110%;white-space:nowrap;font:500 38px/1 var(--zh);color:var(--coral)">謝謝您體諒</span></span>。</div>
   </div>
   <svg id="k-circle" class="k-ink" style="left:50px;top:570px;width:980px;height:360px;" viewBox="0 0 980 360"><path pathLength="1" d="M490 10.8 C 784 7.2, 970.2 72, 960.4 187.2 C 950.6 306, 735 352.8, 450.8 349.2 C 176.4 345.6, 9.8 288, 19.6 172.8 C 29.4 72, 245 18, 539 21.6"/></svg>
-  <div id="k-title" class="k-title" style="top:1000px"><span class="s" style="font-size:112px">品味，是<em>你</em>的</span></div>
+  <div id="k-title" class="k-title" style="top:960px"><span class="s" style="font-size:112px">品味，是<em>你</em>的</span></div>
   </div>
   <script>
     const tl = gsap.timeline({ paused: true });

@@ -44,7 +44,8 @@ em { font-style: normal; color: var(--coral); }
 .k-reply-body { font: 300 38px/1.6 var(--zh); letter-spacing: 0.02em; white-space: pre-line; }
 
 /* 大標：思源黑體 Thin 拉長 1.18 倍。GSAP 只動外層，拉長放在內層 */
-.k-title { position: absolute; left: 60px; right: 60px; text-align: center; }
+/* 拉長 1.18 倍會超出排版高度，下方留 0.3em，遮罩動態才不會切掉字腳 */
+.k-title { position: absolute; left: 60px; right: 60px; text-align: center; padding-bottom: 0.3em; font-size: 124px; }
 .k-title .s {
   display: inline-block; transform: scaleY(1.18); transform-origin: 50% 0;
   font: 200 124px/1.12 var(--zh); letter-spacing: 0.04em; white-space: pre-line;
@@ -91,7 +92,7 @@ em { font-style: normal; color: var(--coral); }
   </div>
   <div id="h-stamp" class="k-stamp" style="right:120px;top:640px">罐頭信</div>
   <svg id="h-strike" class="k-ink" style="left:150px;top:620px;width:780px;height:330px;" viewBox="0 0 780 330"><path pathLength="1" d="M31.2 297 C 234 231, 468 115.5, 748.8 26.4 M 78 198 C 312 165, 546 99, 717.6 99"/></svg>
-  <div id="h-title" class="k-title" style="top:1010px"><span class="s">問題在<em>交代</em></span></div>
+  <div id="h-title" class="k-title" style="top:950px"><span class="s">問題在<em>交代</em></span></div>
   </div>
   <script>
     const tl = gsap.timeline({ paused: true });

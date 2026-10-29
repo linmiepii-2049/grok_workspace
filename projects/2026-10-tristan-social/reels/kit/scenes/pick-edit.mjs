@@ -14,7 +14,7 @@ export default ({ props, ctx }) => {
   ${card("k-a", "A", esc(props.a), 250)}
   ${card("k-b", "B", b, 600)}
   ${ink("k-circle", { left: 50, top: 570, w: 980, h: 360 }, "M50 3 C 80 2, 99 20, 98 52 C 97 85, 75 98, 46 97 C 18 96, 1 80, 2 48 C 3 20, 25 5, 55 6")}
-  <div id="k-title" class="k-title" style="top:1000px"><span class="s" style="font-size:112px">${em(props.title)}</span></div>`;
+  <div id="k-title" class="k-title" style="top:960px"><span class="s" style="font-size:112px">${em(props.title)}</span></div>`;
   const js = [
     mv.grow("#k-a", 0, 0.4),
     mv.grow("#k-b", 0.15, 0.4),

@@ -10,8 +10,8 @@ export default ({ props, ctx }) => {
   </div>
   <div id="c-name" class="abs latin" style="left:0;right:0;top:680px;text-align:center;font:800 44px/1 var(--latin);letter-spacing:.24em;color:var(--ink)">${esc(ctx.profile.author.toUpperCase())}</div>
   <div id="c-handle" class="abs latin" style="left:0;right:0;top:744px;text-align:center;font:500 32px/1 var(--latin);letter-spacing:.06em;color:var(--muted)">${esc(ctx.profile.handle)}</div>
-  <div id="c-title" class="k-title" style="top:850px"><span class="s">${em(props.title)}</span></div>
-  <div id="c-sub" class="abs" style="left:0;right:0;top:1050px;text-align:center;font:400 38px/1 var(--zh);letter-spacing:.04em;color:var(--teal-ink)">${esc(props.sub)}</div>`;
+  <div id="c-title" class="k-title" style="top:830px"><span class="s">${em(props.title)}</span></div>
+  <div id="c-sub" class="abs" style="left:0;right:0;top:1070px;text-align:center;font:400 38px/1 var(--zh);letter-spacing:.04em;color:var(--teal-ink)">${esc(props.sub)}</div>`;
   const js = [
     mv.pop("#c-photo", 0, 0.5),
     mv.wipeRight("#c-name", 0.3, 0.4),

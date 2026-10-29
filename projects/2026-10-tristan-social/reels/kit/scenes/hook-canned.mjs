@@ -15,7 +15,7 @@ export default ({ props, ctx }) => {
   </div>
   <div id="h-stamp" class="k-stamp" style="right:120px;top:640px">${esc(props.stamp)}</div>
   ${ink("h-strike", { left: 150, top: 620, w: 780, h: 330 }, "M4 90 C 30 70, 60 35, 96 8 M 10 60 C 40 50, 70 30, 92 30")}
-  <div id="h-title" class="k-title" style="top:1010px"><span class="s">${em(props.title)}</span></div>`;
+  <div id="h-title" class="k-title" style="top:950px"><span class="s">${em(props.title)}</span></div>`;
 
   const js = [
     // 第 0 格就有 Prompt 和回覆卡頭，當封面

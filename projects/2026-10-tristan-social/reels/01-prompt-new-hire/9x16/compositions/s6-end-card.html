@@ -44,7 +44,8 @@ em { font-style: normal; color: var(--coral); }
 .k-reply-body { font: 300 38px/1.6 var(--zh); letter-spacing: 0.02em; white-space: pre-line; }
 
 /* 大標：思源黑體 Thin 拉長 1.18 倍。GSAP 只動外層，拉長放在內層 */
-.k-title { position: absolute; left: 60px; right: 60px; text-align: center; }
+/* 拉長 1.18 倍會超出排版高度，下方留 0.3em，遮罩動態才不會切掉字腳 */
+.k-title { position: absolute; left: 60px; right: 60px; text-align: center; padding-bottom: 0.3em; font-size: 124px; }
 .k-title .s {
   display: inline-block; transform: scaleY(1.18); transform-origin: 50% 0;
   font: 200 124px/1.12 var(--zh); letter-spacing: 0.04em; white-space: pre-line;
@@ -86,8 +87,8 @@ em { font-style: normal; color: var(--coral); }
   </div>
   <div id="c-name" class="abs latin" style="left:0;right:0;top:680px;text-align:center;font:800 44px/1 var(--latin);letter-spacing:.24em;color:var(--ink)">TRISTAN</div>
   <div id="c-handle" class="abs latin" style="left:0;right:0;top:744px;text-align:center;font:500 32px/1 var(--latin);letter-spacing:.06em;color:var(--muted)">@tris.tan.2049</div>
-  <div id="c-title" class="k-title" style="top:850px"><span class="s">留言「<em>指令</em>」</span></div>
-  <div id="c-sub" class="abs" style="left:0;right:0;top:1050px;text-align:center;font:400 38px/1 var(--zh);letter-spacing:.04em;color:var(--teal-ink)">送你《上班族 AI 指令包 30 招》</div>
+  <div id="c-title" class="k-title" style="top:830px"><span class="s">留言「<em>指令</em>」</span></div>
+  <div id="c-sub" class="abs" style="left:0;right:0;top:1070px;text-align:center;font:400 38px/1 var(--zh);letter-spacing:.04em;color:var(--teal-ink)">送你《上班族 AI 指令包 30 招》</div>
   </div>
   <script>
     const tl = gsap.timeline({ paused: true });

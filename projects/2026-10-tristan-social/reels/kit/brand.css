@@ -37,7 +37,8 @@ em { font-style: normal; color: var(--coral); }
 .k-reply-body { font: 300 38px/1.6 var(--zh); letter-spacing: 0.02em; white-space: pre-line; }
 
 /* 大標：思源黑體 Thin 拉長 1.18 倍。GSAP 只動外層，拉長放在內層 */
-.k-title { position: absolute; left: 60px; right: 60px; text-align: center; }
+/* 拉長 1.18 倍會超出排版高度，下方留 0.3em，遮罩動態才不會切掉字腳 */
+.k-title { position: absolute; left: 60px; right: 60px; text-align: center; padding-bottom: 0.3em; font-size: 124px; }
 .k-title .s {
   display: inline-block; transform: scaleY(1.18); transform-origin: 50% 0;
   font: 200 124px/1.12 var(--zh); letter-spacing: 0.04em; white-space: pre-line;
