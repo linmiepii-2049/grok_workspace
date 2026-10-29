@@ -1,9 +1,9 @@
 {
   "theme": "beige-teal",
-  "series": "AI 工具情報",
-  "seriesEn": "AI TOOL WATCH",
+  "series": "AI 工具包",
+  "seriesEn": "AI TOOLKIT",
   "no": "01",
-  "emblem": "器",
+  "emblem": "包",
   "slides": [
     {
       "type": "cover",
