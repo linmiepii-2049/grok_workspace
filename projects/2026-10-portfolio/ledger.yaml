@@ -5,11 +5,11 @@ opening_date: 2026-10-29 # 起始日：從這天開始記錄資產曲線
 
 # ── 帳戶與現金 ────────────────────────────────
 # 每個帳戶一種幣別；cash 是起始日當天的現金餘額
-# TODO：現金餘額還沒填，帳戶名稱也可以改成券商名稱（要同步改下面的 account）
+# 帳戶名稱可以改成券商名稱（要同步改下面的 account）
 accounts:
   - name: 台股帳戶
     currency: TWD
-    cash: 0
+    cash: 3291503
   - name: 美股帳戶
     currency: USD
     cash: 0
