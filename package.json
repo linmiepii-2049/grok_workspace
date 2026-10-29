@@ -13,6 +13,7 @@
     "viewer:seed": "node apps/viewer/seed.mjs"
   },
   "devDependencies": {
+    "hyperframes": "0.8.212",
     "wrangler": "4.54.0"
   }
 }

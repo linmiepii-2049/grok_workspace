@@ -1,4 +1,15 @@
 {
+  "env": {
+    "HYPERFRAMES_NO_TELEMETRY": "1"
+  },
+  "extraKnownMarketplaces": {
+    "hyperframes": {
+      "source": { "source": "github", "repo": "heygen-com/hyperframes" }
+    }
+  },
+  "enabledPlugins": {
+    "hyperframes@hyperframes": true
+  },
   "hooks": {
     "SessionStart": [
       {
@@ -6,7 +17,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"$CLAUDE_PROJECT_DIR\" && { [ -x node_modules/.bin/wrangler ] || npm ci --no-audit --no-fund --loglevel=error; }",
+            "command": "cd \"$CLAUDE_PROJECT_DIR\" && { [ -x node_modules/.bin/wrangler ] && [ -x node_modules/.bin/hyperframes ] || npm ci --no-audit --no-fund --loglevel=error; }",
+            "timeout": 300
+          },
+          {
+            "type": "command",
+            "command": "command -v ffmpeg >/dev/null || [ \"$(uname)\" != Linux ] || { apt-get update -qq && apt-get install -y -qq ffmpeg; } >/dev/null 2>&1 || echo '⚠️ 雲端 ffmpeg 安裝失敗，motion-video 無法渲染'",
             "timeout": 300
           }
         ]

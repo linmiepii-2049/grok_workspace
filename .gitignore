@@ -14,3 +14,11 @@ projects/*/outputs/**/*.m4v
 projects/*/outputs/**/*.wav
 projects/*/outputs/**/*.mp3
 projects/*/outputs/**/*.m4a
+
+# motion-video 的自檢結果、逐章渲染暫存、snapshot 總表，可隨時重新產生
+projects/*/video/**/.qa/
+projects/*/video/**/.render/
+projects/*/video/**/snapshots/
+projects/*/video/**/renders/
+projects/*/video/**/.hyperframes/
+projects/*/video/.draft/

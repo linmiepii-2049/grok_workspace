@@ -1,0 +1,71 @@
+name: tts
+
+# 雲端 session 不持有 ElevenLabs 密鑰：推上 voiceover.json 後，這裡用 GitHub Secrets 產生旁白，commit 回同一個分支
+# tts.mjs 會跳過內容沒變的行，重跑不會重複計費
+on:
+  push:
+    paths: ["projects/*/video/voiceover.json"]
+  workflow_dispatch:
+    inputs:
+      voiceover:
+        description: voiceover.json 路徑，例如 projects/2026-10-demo/video/voiceover.json
+        required: true
+
+concurrency:
+  group: tts-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  tts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 2
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      # tts.mjs 用 ffprobe 量 mp3 實際長度
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+
+      - name: 找出要處理的 voiceover.json
+        id: files
+        env:
+          INPUT: ${{ inputs.voiceover }}
+        run: |
+          if [ -n "$INPUT" ]; then
+            files="$INPUT"
+          else
+            files="$(git diff --name-only HEAD~1 HEAD -- 'projects/*/video/voiceover.json' || true)"
+          fi
+          echo "list<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$files" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: 產生旁白
+        env:
+          # 中文用 MiniMax、英文用 ElevenLabs；tts.mjs 依 voiceover.json 的 provider 取用對應的密鑰
+          MINIMAX_API_KEY: ${{ secrets.MINIMAX_API_KEY }}
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          FILES: ${{ steps.files.outputs.list }}
+        run: |
+          [ -n "$MINIMAX_API_KEY$ELEVENLABS_API_KEY" ] || { echo "::error::缺少 MINIMAX_API_KEY 或 ELEVENLABS_API_KEY secret"; exit 1; }
+          echo "$FILES" | while read -r f; do
+            [ -n "$f" ] && [ -f "$f" ] || continue
+            node .claude/skills/motion-video/scripts/tts.mjs "$f"
+          done
+
+      - name: commit 回分支
+        run: |
+          git add -A projects
+          git diff --cached --quiet && { echo "沒有新的旁白"; exit 0; }
+          git config user.name "github-actions[bot]"
+          git config user.email "41898+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore(tts): 產生旁白"
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
