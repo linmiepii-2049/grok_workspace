@@ -1,0 +1,27 @@
+[
+  {
+    "id": "s1-01",
+    "file": "s1-01.mp3",
+    "duration": 3.32
+  },
+  {
+    "id": "s2-01",
+    "file": "s2-01.mp3",
+    "duration": 2.473
+  },
+  {
+    "id": "s3-01",
+    "file": "s3-01.mp3",
+    "duration": 2.473
+  },
+  {
+    "id": "s4-01",
+    "file": "s4-01.mp3",
+    "duration": 3.274
+  },
+  {
+    "id": "s5-01",
+    "file": "s5-01.mp3",
+    "duration": 2.891
+  }
+]

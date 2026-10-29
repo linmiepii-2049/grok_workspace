@@ -1,0 +1,81 @@
+{
+  "total": 16.331,
+  "maxChars": 14,
+  "lines": [
+    {
+      "id": "s1-01",
+      "text": "同一個問題，AI 為什麼每次回答都不一樣？",
+      "file": "assets/audio/vo/s1-01.mp3",
+      "start": 0.3,
+      "duration": 3.32,
+      "captions": [
+        {
+          "text": "同一個問題",
+          "start": 0.343,
+          "end": 0.983
+        },
+        {
+          "text": "AI 為什麼每次回答都不一樣？",
+          "start": 0.983,
+          "end": 3.62
+        }
+      ]
+    },
+    {
+      "id": "s2-01",
+      "text": "因為它有一個旋鈕，叫做溫度。",
+      "file": "assets/audio/vo/s2-01.mp3",
+      "start": 3.87,
+      "duration": 2.473,
+      "captions": [
+        {
+          "text": "因為它有一個旋鈕　叫做溫度",
+          "start": 3.913,
+          "end": 6.343
+        }
+      ]
+    },
+    {
+      "id": "s3-01",
+      "text": "溫度低，它只挑最穩的字；",
+      "file": "assets/audio/vo/s3-01.mp3",
+      "start": 6.593,
+      "duration": 2.473,
+      "captions": [
+        {
+          "text": "溫度低　它只挑最穩的字",
+          "start": 6.636,
+          "end": 9.066
+        }
+      ]
+    },
+    {
+      "id": "s4-01",
+      "text": "溫度高，它敢冒險，也更有創意。",
+      "file": "assets/audio/vo/s4-01.mp3",
+      "start": 9.316,
+      "duration": 3.274,
+      "captions": [
+        {
+          "text": "溫度高　它敢冒險　也更有創意",
+          "start": 9.359,
+          "end": 12.59
+        }
+      ]
+    },
+    {
+      "id": "s5-01",
+      "text": "寫報告調低，想點子調高。",
+      "file": "assets/audio/vo/s5-01.mp3",
+      "start": 12.84,
+      "duration": 2.891,
+      "captions": [
+        {
+          "text": "寫報告調低　想點子調高",
+          "start": 12.883,
+          "end": 15.731
+        }
+      ]
+    }
+  ]
+}

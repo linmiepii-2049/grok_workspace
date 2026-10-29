@@ -1,0 +1,608 @@
+<!doctype html>
+<html lang="zh-Hant" data-resolution="landscape">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.11.1/lib/p5.min.js"></script>
+    <style>
+      @font-face {
+        font-family: "Noto Serif TC";
+        src: url("assets/fonts/NotoSerifTC-Bold.woff2") format("woff2");
+        font-weight: 700;
+      }
+      @font-face {
+        font-family: "Noto Sans TC";
+        src: url("assets/fonts/NotoSansTC-Bold.woff2") format("woff2");
+        font-weight: 700;
+      }
+      @font-face {
+        font-family: "DM Mono";
+        src: url("assets/fonts/DMMono-Regular.woff2") format("woff2");
+        font-weight: 400;
+      }
+      /* FRAME.md：cobalt-grid 中文版 */
+      :root {
+        --paper: #f0ebde;
+        --ink: #1f2be0;
+        --ink-soft: #5560e5;
+        --grid: rgba(31, 43, 224, 0.1);
+        --hot: #e5482b;
+        --serif: "Noto Serif TC", serif;
+        --sans: "Noto Sans TC", sans-serif;
+        --mono: "DM Mono", monospace;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: var(--paper);
+      }
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        color: var(--ink);
+        font-family: var(--sans);
+        background-color: var(--paper);
+        background-image:
+          linear-gradient(var(--grid) 2px, transparent 2px),
+          linear-gradient(90deg, var(--grid) 2px, transparent 2px);
+        background-size: 54px 54px;
+        background-position: 0 0;
+      }
+      .layer {
+        position: absolute;
+        inset: 0;
+      }
+      .hairline {
+        position: absolute;
+        left: 44px;
+        right: 44px;
+        height: 3px;
+        background: var(--ink);
+      }
+      #hair-top {
+        top: 58px;
+      }
+      #hair-bottom {
+        bottom: 58px;
+      }
+      #chrome {
+        position: absolute;
+        left: 44px;
+        top: 76px;
+        font: 400 28px/1 var(--mono);
+        letter-spacing: 0.06em;
+        color: var(--ink-soft);
+      }
+
+      /* S1 問題與答案卡 */
+      #question {
+        position: absolute;
+        left: 120px;
+        right: 160px;
+        top: 250px;
+        padding: 36px 44px;
+        border: 3px solid var(--ink);
+        background: var(--paper);
+        font: 700 76px/1.2 var(--serif);
+        letter-spacing: 0.02em;
+      }
+      #question small {
+        display: block;
+        margin-bottom: 14px;
+        font: 400 30px/1 var(--mono);
+        color: var(--ink-soft);
+      }
+      .card {
+        position: absolute;
+        left: 160px;
+        right: 160px;
+        height: 170px;
+        padding: 0 44px;
+        display: flex;
+        align-items: center;
+        gap: 36px;
+        background: var(--ink);
+        color: var(--paper);
+        transform-origin: 50% 0;
+      }
+      .card .n {
+        font: 400 32px/1 var(--mono);
+        opacity: 0.7;
+      }
+      .card .a {
+        font: 700 66px/1 var(--serif);
+        letter-spacing: 0.02em;
+      }
+      #card-1 {
+        top: 620px;
+      }
+      #card-2 {
+        top: 830px;
+      }
+      #card-3 {
+        top: 1040px;
+      }
+
+      /* S2–S4 旋鈕與標籤 */
+      #knob-canvas {
+        position: absolute;
+        left: 90px;
+        top: 330px;
+        width: 900px;
+        height: 900px;
+      }
+      #knob-label {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 1180px;
+        text-align: center;
+      }
+      #label-name {
+        font: 700 78px/1 var(--serif);
+        letter-spacing: 0.04em;
+      }
+      #label-name span {
+        font: 400 40px/1 var(--mono);
+        color: var(--ink-soft);
+        letter-spacing: 0.02em;
+        margin-left: 14px;
+      }
+      .label-value {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        font: 400 64px/1 var(--mono);
+        letter-spacing: 0.02em;
+      }
+      #label-high {
+        color: var(--hot);
+      }
+
+      /* S5 結論兩欄 */
+      .col {
+        position: absolute;
+        top: 560px;
+        width: 400px;
+        height: 560px;
+        border: 3px solid var(--ink);
+        background: var(--paper);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 48px;
+      }
+      #col-low {
+        left: 120px;
+      }
+      #col-high {
+        left: 560px;
+      }
+      .col .task {
+        font: 700 84px/1 var(--serif);
+        letter-spacing: 0.04em;
+      }
+      .col .dir {
+        font: 700 64px/1 var(--sans);
+        letter-spacing: 0.04em;
+      }
+      #col-high .dir {
+        color: var(--hot);
+      }
+
+      /* 字幕：y 68–78%，避開 9:16 下方 20% 安全區 */
+      #captions {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 1340px;
+        height: 150px;
+      }
+      .caption {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        display: flex;
+        justify-content: center;
+      }
+      .caption span {
+        padding: 18px 30px;
+        background: var(--paper);
+        border-top: 3px solid var(--ink);
+        font: 700 60px/1.25 var(--sans);
+        letter-spacing: 0.02em;
+        color: var(--ink);
+        white-space: nowrap;
+      }
+    </style>
+    <style id="landscape">
+      /* 16:9 版面：從 9:16 改版面，時間軸與文案不變 */
+      #chrome { top: 74px; }
+      #question { left: 160px; right: auto; width: 720px; top: 330px; }
+      .card { left: 1000px; right: 160px; height: 150px; }
+      #card-1 { top: 230px; }
+      #card-2 { top: 410px; }
+      #card-3 { top: 590px; }
+      #knob-canvas { left: 200px; top: 100px; width: 720px; height: 720px; }
+      #knob-label { left: 1000px; right: 120px; top: 400px; text-align: left; }
+      .label-value { right: auto; }
+      .col { top: 190px; width: 520px; height: 560px; }
+      #col-low { left: 380px; }
+      #col-high { left: 1020px; }
+      /* 16:9 下方 10% 是播放器進度列，字幕放在 y 80–88% */
+      #captions { top: 830px; height: 100px; }
+      .caption span { font-size: 56px; padding: 14px 30px; }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="16.771"
+      data-width="1920"
+      data-height="1080"
+    >
+      <!-- 粒子背景（p5.js），S3–S4 -->
+      <div
+        id="particles-host"
+        class="clip layer"
+        data-start="6.366"
+        data-duration="7.006"
+        data-track-index="1"
+      >
+        <div id="particles" class="layer"></div>
+      </div>
+
+      <div
+        id="frame"
+        class="clip layer"
+        data-start="0"
+        data-duration="16.771"
+        data-track-index="2"
+      >
+        <div id="hair-top" class="hairline"></div>
+        <div id="hair-bottom" class="hairline"></div>
+        <div id="chrome">LLM · TEMPERATURE</div>
+      </div>
+
+      <!-- S1 -->
+      <div
+        id="s1"
+        class="clip layer"
+        data-start="0"
+        data-duration="4.055"
+        data-track-index="3"
+      >
+        <div id="question"><small>PROMPT</small>幫我取個店名</div>
+        <div id="card-1" class="card">
+          <span class="n">01</span><span class="a">慢慢來</span>
+        </div>
+        <div id="card-2" class="card">
+          <span class="n">02</span><span class="a">日常咖啡</span>
+        </div>
+        <div id="card-3" class="card">
+          <span class="n">03</span><span class="a">豆子研究所</span>
+        </div>
+      </div>
+
+      <!-- S2–S4 旋鈕（three.js） -->
+      <div
+        id="knob-host"
+        class="clip layer"
+        data-start="3.755"
+        data-duration="9.617"
+        data-track-index="4"
+      >
+        <canvas id="knob-canvas" width="900" height="900"></canvas>
+        <div id="knob-label">
+          <div id="label-name">溫度<span>temperature</span></div>
+          <div id="label-low" class="label-value">temperature = 0.2</div>
+          <div id="label-high" class="label-value">temperature = 1.2</div>
+        </div>
+      </div>
+
+      <!-- S5 -->
+      <div
+        id="s5"
+        class="clip layer"
+        data-start="12.772"
+        data-duration="3.999"
+        data-track-index="5"
+      >
+        <div id="col-low" class="col">
+          <div class="task">寫報告</div>
+          <div class="dir">↓ 調低</div>
+        </div>
+        <div id="col-high" class="col">
+          <div class="task">想點子</div>
+          <div class="dir">↑ 調高</div>
+        </div>
+      </div>
+
+      <!-- 旁白與字幕：時間來自 vo-timeline.mjs -->
+      <!-- vo:begin -->
+<audio id="vo-s1-01" class="clip" src="assets/audio/vo/s1-01.mp3" data-start="0.300" data-duration="3.320"></audio>
+<audio id="vo-s2-01" class="clip" src="assets/audio/vo/s2-01.mp3" data-start="3.870" data-duration="2.473"></audio>
+<audio id="vo-s3-01" class="clip" src="assets/audio/vo/s3-01.mp3" data-start="6.593" data-duration="2.473"></audio>
+<audio id="vo-s4-01" class="clip" src="assets/audio/vo/s4-01.mp3" data-start="9.316" data-duration="3.274"></audio>
+<audio id="vo-s5-01" class="clip" src="assets/audio/vo/s5-01.mp3" data-start="12.840" data-duration="2.891"></audio>
+<div id="captions" data-track-kind="captions">
+  <div id="cap-s1-01-1" class="clip caption" data-start="0.343" data-duration="0.640"><span>同一個問題</span></div>
+  <div id="cap-s1-01-2" class="clip caption" data-start="0.983" data-duration="2.637"><span>AI 為什麼每次回答都不一樣？</span></div>
+  <div id="cap-s2-01-1" class="clip caption" data-start="3.913" data-duration="2.430"><span>因為它有一個旋鈕　叫做溫度</span></div>
+  <div id="cap-s3-01-1" class="clip caption" data-start="6.636" data-duration="2.430"><span>溫度低　它只挑最穩的字</span></div>
+  <div id="cap-s4-01-1" class="clip caption" data-start="9.359" data-duration="3.231"><span>溫度高　它敢冒險　也更有創意</span></div>
+  <div id="cap-s5-01-1" class="clip caption" data-start="12.883" data-duration="2.848"><span>寫報告調低　想點子調高</span></div>
+</div>
+<!-- vo:end -->
+    </div>
+
+    <script>
+      // 旁白錨點：retime.mjs 會依新旁白改寫這一行，動畫時間都寫成相對錨點
+      const VO = {"s1-01":0.3,"s2-01":3.87,"s3-01":6.593,"s4-01":9.316,"s5-01":12.84,"end":16.771};
+      const S2 = VO["s2-01"], S3 = VO["s3-01"], S4 = VO["s4-01"], S5 = VO["s5-01"];
+
+      // ---------- 共用：時間 → 0..1 ----------
+      const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+      const ramp = (t, a, b) => clamp((t - a) / (b - a));
+      const ease = (x) => 1 - Math.pow(1 - x, 3); // power3.out
+      const smooth = (x) => x * x * (3 - 2 * x);
+
+      // 溫度隨時間變化：S2 0.7 → S3 0.2 → S4 1.2
+      const tempAt = (t) => {
+        if (t < S3 + 0.07) return 0.7;
+        if (t < S4 + 0.04) return 0.7 - 0.5 * smooth(ramp(t, S3 + 0.07, S3 + 0.87));
+        return 0.2 + 1.0 * smooth(ramp(t, S4 + 0.04, S4 + 0.84));
+      };
+      // 0（低溫有序）到 1（高溫亂流）
+      const chaosAt = (t) => smooth(ramp(t, S4 + 0.04, S4 + 0.84));
+
+      // ---------- GSAP：DOM 動畫 ----------
+      const tl = gsap.timeline({ paused: true });
+      // S1
+      tl.fromTo(
+        "#question",
+        { y: 24, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.5, ease: "power3.out" },
+        0.2,
+      );
+      [0.7, 1.3, 1.9].forEach((at, i) => {
+        tl.fromTo(
+          `#card-${i + 1}`,
+          { rotationX: -90, opacity: 0 },
+          { rotationX: 0, opacity: 1, duration: 0.45, ease: "power3.out" },
+          at,
+        );
+      });
+      tl.to(
+        ".card",
+        {
+          scaleY: 0,
+          opacity: 0,
+          duration: 0.35,
+          ease: "power2.in",
+          stagger: 0.06,
+        },
+        S2 - 0.42,
+      );
+      tl.to(
+        "#question",
+        { y: -24, opacity: 0, duration: 0.35, ease: "power2.in" },
+        S2 - 0.32,
+      );
+      // S2–S4 標籤
+      tl.fromTo(
+        "#label-name",
+        { y: 24, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.5, ease: "power3.out" },
+        S2 + 0.69,
+      );
+      tl.to(
+        "#label-name",
+        { y: -24, opacity: 0, duration: 0.3, ease: "power2.in" },
+        S3 - 0.03,
+      );
+      tl.fromTo(
+        "#label-low",
+        { y: 24, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.4, ease: "power3.out" },
+        S3 + 0.27,
+      );
+      tl.to(
+        "#label-low",
+        { y: -24, opacity: 0, duration: 0.3, ease: "power2.in" },
+        S4 - 0.06,
+      );
+      tl.fromTo(
+        "#label-high",
+        { y: 24, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.4, ease: "power3.out" },
+        S4 + 0.34,
+      );
+      tl.to(
+        "#label-high",
+        { opacity: 0, duration: 0.3, ease: "power2.in" },
+        S5 - 0.17,
+      );
+      // S5
+      tl.fromTo(
+        "#col-low",
+        { y: 40, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.5, ease: "power3.out" },
+        S5 + 0.13,
+      );
+      tl.fromTo(
+        "#col-high",
+        { y: 40, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.5, ease: "power3.out" },
+        S5 + 1.38,
+      );
+      // 字幕進場
+      document.querySelectorAll(".caption span").forEach((el) => {
+        const start = parseFloat(el.parentElement.dataset.start);
+        tl.fromTo(
+          el,
+          { y: 16, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.25, ease: "power3.out" },
+          start,
+        );
+      });
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+
+      // ---------- three.js：旋鈕 ----------
+      const canvas = document.getElementById("knob-canvas");
+      const renderer = new THREE.WebGLRenderer({
+        canvas,
+        alpha: true,
+        antialias: true,
+        preserveDrawingBuffer: true,
+      });
+      renderer.setPixelRatio(1);
+      renderer.setSize(900, 900, false);
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
+      camera.position.set(0, 0, 14);
+      scene.add(new THREE.AmbientLight(0xffffff, 0.75));
+      const key = new THREE.DirectionalLight(0xffffff, 0.6);
+      key.position.set(-4, 6, 8);
+      scene.add(key);
+
+      const INK = new THREE.Color("#1f2be0");
+      const HOT = new THREE.Color("#e5482b");
+      const knob = new THREE.Group();
+      scene.add(knob);
+      const body = new THREE.Mesh(
+        new THREE.CylinderGeometry(2.3, 2.45, 1.0, 64),
+        new THREE.MeshStandardMaterial({
+          color: INK,
+          roughness: 0.65,
+          metalness: 0.1,
+        }),
+      );
+      body.rotation.x = Math.PI / 2;
+      knob.add(body);
+      const cap = new THREE.Mesh(
+        new THREE.CylinderGeometry(1.7, 1.7, 0.12, 64),
+        new THREE.MeshStandardMaterial({
+          color: new THREE.Color("#3a46e8"),
+          roughness: 0.5,
+        }),
+      );
+      cap.rotation.x = Math.PI / 2;
+      cap.position.z = 0.56;
+      knob.add(cap);
+      const pointer = new THREE.Mesh(
+        new THREE.BoxGeometry(0.22, 1.2, 0.1),
+        new THREE.MeshBasicMaterial({ color: new THREE.Color("#f0ebde") }),
+      );
+      pointer.position.set(0, 1.25, 0.64);
+      const dial = new THREE.Group();
+      dial.add(pointer);
+      knob.add(dial);
+
+      // 刻度環：0 到 2 對應 -135° 到 +135°
+      const ticks = [];
+      const TICKS = 21;
+      const ring = new THREE.Group();
+      for (let i = 0; i < TICKS; i++) {
+        const a = THREE.MathUtils.degToRad(135 - (270 * i) / (TICKS - 1));
+        const major = i % 5 === 0;
+        const m = new THREE.Mesh(
+          new THREE.BoxGeometry(0.12, major ? 0.6 : 0.36, 0.06),
+          new THREE.MeshBasicMaterial({ color: INK.clone() }),
+        );
+        const r = 3.05;
+        m.position.set(-Math.sin(a) * r, Math.cos(a) * r, 0);
+        m.rotation.z = a;
+        ring.add(m);
+        ticks.push(m);
+      }
+      knob.add(ring);
+      const angleOf = (temp) => THREE.MathUtils.degToRad(135 - 135 * temp);
+
+      const renderKnob = (t) => {
+        const enter = ease(ramp(t, S2 + 0.09, S2 + 0.99));
+        const exit = ramp(t, S5 - 0.17, S5 + 0.23);
+        knob.scale.setScalar(0.7 + 0.3 * enter - 0.25 * exit);
+        canvas.style.opacity = String(enter * (1 - exit));
+        // 從側面轉到正面，之後保持微微傾斜
+        knob.rotation.x = -0.9 * (1 - enter) - 0.18;
+        knob.rotation.y = 0.5 * (1 - enter) + 0.12 * Math.sin(t * 0.6);
+        const temp = tempAt(t);
+        dial.rotation.z = angleOf(temp);
+        // 高溫時，超過目前溫度以下的刻度轉成 hot 色
+        const hot = chaosAt(t);
+        ticks.forEach((m, i) => {
+          const v = (2 * i) / (TICKS - 1);
+          const on = v <= temp + 1e-6;
+          const base = on ? INK : new THREE.Color("#b9bbe9");
+          m.material.color.copy(base).lerp(HOT, on && v > 0.9 ? hot : 0);
+        });
+        renderer.render(scene, camera);
+      };
+
+      // ---------- p5.js：粒子 ----------
+      let currentT = 0;
+      const N = 220;
+      const LANES = 13;
+      const sketch = new p5((p) => {
+        p.setup = () => {
+          const c = p.createCanvas(1920, 1080);
+          c.parent("particles");
+          p.pixelDensity(1);
+          p.noiseSeed(7);
+          p.randomSeed(7);
+          p.noLoop();
+        };
+        p.draw = () => {
+          const t = currentT;
+          p.clear();
+          const vis = ramp(t, S3 - 0.13, S3 + 0.47) * (1 - ramp(t, S5 - 0.17, S5 + 0.33));
+          if (vis <= 0) return;
+          const chaos = chaosAt(t);
+          p.noStroke();
+          for (let i = 0; i < N; i++) {
+            const lane = i % LANES;
+            const y0 = 110 + lane * 72;
+            // 低溫：沿著車道等速流動；高溫：用 noise 偏離車道
+            const speed = 60 + (lane % 3) * 14;
+            const x0 = ((((i * 197.31) % 2020) + t * speed) % 2020) - 50;
+            const nx = p.noise(i * 0.31, t * 0.9) - 0.5;
+            const ny = p.noise(i * 0.31 + 50, t * 0.9) - 0.5;
+            const x = x0 + nx * 520 * chaos;
+            const y = y0 + Math.sin(x0 * 0.012 + lane) * 6 + ny * 620 * chaos;
+            const hot = chaos > 0.5 && i % 9 === 0;
+            const col = hot ? p.color(229, 72, 43) : p.color(31, 43, 224);
+            col.setAlpha(255 * vis * (hot ? 0.8 : 0.5));
+            p.fill(col);
+            p.circle(x, y, hot ? 16 : 12);
+          }
+        };
+      });
+
+      const renderAt = (t) => {
+        currentT = t;
+        renderKnob(t);
+        sketch.redraw();
+      };
+      window.addEventListener("hf-seek", (e) => renderAt(e.detail.time));
+      renderAt(0);
+    </script>
+  </body>
+</html>

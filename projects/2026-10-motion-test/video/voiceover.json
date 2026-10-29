@@ -1,0 +1,29 @@
+{
+  "provider": "minimax",
+  "voice_id": "Chinese_casual_instructor_nv1",
+  "model_id": "speech-2.8-hd",
+  "language_boost": "Chinese",
+  "output_dir": "9x16/assets/audio/vo",
+  "lines": [
+    {
+      "id": "s1-01",
+      "text": "同一個問題，AI 為什麼每次回答都不一樣？"
+    },
+    {
+      "id": "s2-01",
+      "text": "因為它有一個旋鈕，叫做溫度。"
+    },
+    {
+      "id": "s3-01",
+      "text": "溫度低，它只挑最穩的字；"
+    },
+    {
+      "id": "s4-01",
+      "text": "溫度高，它敢冒險，也更有創意。"
+    },
+    {
+      "id": "s5-01",
+      "text": "寫報告調低，想點子調高。"
+    }
+  ]
+}
