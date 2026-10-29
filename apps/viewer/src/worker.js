@@ -184,6 +184,76 @@ async function usage(env) {
   };
 }
 
+// ---------- 投資追蹤（資料由 tools/portfolio 排程寫入）----------
+
+async function portfolioSummary(env) {
+  const [{ results: series }, latest, { results: realized }] =
+    await Promise.all([
+      env.DB.prepare(
+        `SELECT date, total, market_value, cash, cost, unrealized, realized_cum, income_cum, net_flow, twr, bench, fx_usd FROM pf_snapshots ORDER BY date`,
+      ).all(),
+      env.DB.prepare(
+        `SELECT date, positions, cash_by_ccy FROM pf_snapshots ORDER BY date DESC LIMIT 1`,
+      ).first(),
+      env.DB.prepare(
+        `SELECT date, symbol, account, shares, proceeds, cost, pnl, pnl_price, pnl_fx FROM pf_realized ORDER BY date DESC, id DESC`,
+      ).all(),
+    ]);
+  return {
+    series: series.map((s) => ({ ...s, bench: JSON.parse(s.bench) })),
+    positions: latest ? JSON.parse(latest.positions) : [],
+    cash_by_ccy: latest ? JSON.parse(latest.cash_by_ccy) : {},
+    realized,
+  };
+}
+
+async function portfolioEvents(env, days) {
+  const today = new Date(Date.now() + 8 * 3600_000).toISOString().slice(0, 10);
+  const { results } = await env.DB.prepare(
+    `SELECT date, kind, symbol, title, detail FROM pf_events WHERE date >= ? AND date <= date(?, '+' || ? || ' days') ORDER BY date, kind, title`,
+  )
+    .bind(today, today, Math.min(Math.max(days, 1), 120))
+    .all();
+  return results;
+}
+
+async function portfolioNews(env, symbol) {
+  const { results } = await env.DB.prepare(
+    `SELECT url, symbol, title, source, summary, published_at FROM pf_news WHERE (?1 IS NULL OR symbol = ?1) ORDER BY published_at DESC LIMIT 30`,
+  )
+    .bind(symbol || null)
+    .all();
+  return results;
+}
+
+async function portfolioBriefs(env, date) {
+  if (date)
+    return env.DB.prepare(
+      `SELECT date, title, body, model, created_at FROM pf_briefs WHERE date = ?`,
+    )
+      .bind(date)
+      .first();
+  const { results } = await env.DB.prepare(
+    `SELECT date, title FROM pf_briefs ORDER BY date DESC LIMIT 60`,
+  ).all();
+  return results;
+}
+
+async function handlePortfolio(env, url, action, id) {
+  if (action === "summary") return json(await portfolioSummary(env));
+  if (action === "events")
+    return json(
+      await portfolioEvents(env, Number(url.searchParams.get("days")) || 30),
+    );
+  if (action === "news")
+    return json(await portfolioNews(env, url.searchParams.get("symbol")));
+  if (action === "briefs") {
+    const brief = await portfolioBriefs(env, id);
+    return brief ? json(brief) : error(404, "找不到這天的晨報");
+  }
+  return error(404, "找不到");
+}
+
 // ---------- 檔案 ----------
 
 // 使用者的 HTML / SVG 和瀏覽頁同網域：用 CSP sandbox 讓它變成獨立來源，碰不到 Access cookie 與 API
@@ -427,6 +497,7 @@ export default {
         if (resource === "usage") return json(await usage(env));
         if (resource === "gdrive") return handleGdrive(request, env, url, id, sub);
         if (resource === "offload" && id === "jobs") return json(await listJobs(env));
+        if (resource === "portfolio") return handlePortfolio(env, url, id, sub);
       }
       return error(404, "找不到");
     } catch (e) {

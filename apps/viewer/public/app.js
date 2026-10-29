@@ -264,7 +264,7 @@ async function homePage() {
   document.title = "JTeam 成品庫";
   pollJobs(jobs);
   return `
-    <div class="topbar"><span class="mono">JTEAM / ARCHIVE</span>${themeButton()}</div>
+    <div class="topbar"><span class="mono">JTEAM / ARCHIVE</span><span class="topbar-end"><a class="back" href="/portfolio">投資追蹤 →</a>${themeButton()}</span></div>
     <header class="masthead">
       <h1>成品庫<span class="dot">.</span></h1>
       <span class="mono">${projects.length} 個專案 · ${total} 件成品</span>
