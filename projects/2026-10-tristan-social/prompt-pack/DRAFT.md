@@ -1,6 +1,6 @@
 # 上班族 AI 指令包 30 招（文字稿）
 
-> 排版成 PDF 前的文字稿。定稿後排版輸出到 `outputs/prompt-pack/`。
+> 文字稿。改完執行 `node prompt-pack/build-pdf.mjs`，排成 `outputs/prompt-pack/上班族-AI-指令包-30招.pdf`。
 
 ## 封面
 
