@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #ccc; }
+  /* 三種底色輪流：灰藍紙、藏青、米色紙 */
+  .slide {
+    --k: 1;
+    position: relative; overflow: hidden;
+    width: var(--w); height: var(--h);
+    font-family: var(--f-body), sans-serif; font-weight: 400;
+    line-break: strict; overflow-wrap: anywhere;
+    margin-bottom: 40px;
+    background: var(--bgc); color: var(--fg);
+  }
+  .on-blue  { --bgc: var(--blue);  --fg: var(--navy);  --sub: var(--deep);  --box: var(--paper); --boxfg: var(--navy); }
+  .on-navy  { --bgc: var(--navy);  --fg: var(--paper); --sub: #C9D6E6;      --box: var(--paper); --boxfg: var(--navy); }
+  .on-paper { --bgc: var(--paper); --fg: var(--navy);  --sub: var(--muted); --box: var(--hl);    --boxfg: var(--navy); }
+  /* 紙張顆粒和皺摺 */
+  .slide::before {
+    content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    background:
+      radial-gradient(ellipse 60% 40% at 20% 30%, rgba(255,255,255,.10), transparent 70%),
+      radial-gradient(ellipse 50% 35% at 80% 75%, rgba(0,0,0,.07), transparent 70%),
+      linear-gradient(115deg, transparent 48%, rgba(255,255,255,.06) 50%, transparent 52%);
+  }
+  .slide::after, .paper::after {
+    content: ""; position: absolute; inset: 0; z-index: 9; pointer-events: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    opacity: .22; mix-blend-mode: multiply;
+  }
+  .frame {
+    position: absolute; inset: 110px 96px 180px 96px;
+    display: flex; flex-direction: column; z-index: 3;
+  }
+  .frame > * { flex: none; }
+  .deco { position: absolute; z-index: 1; }
+
+  /* 標題：襯線體，重點字壓色塊 */
+  .tw { position: relative; }
+  .title {
+    font-family: var(--f-title), serif; font-weight: var(--title-w);
+    line-height: 1.32; letter-spacing: .02em; white-space: pre-line; text-wrap: balance;
+  }
+  em { font-style: normal; }
+  .title em, .box-title .title {
+    background: var(--box); color: var(--boxfg);
+    padding: 0 .16em; margin: 0 .04em;
+    -webkit-box-decoration-break: clone; box-decoration-break: clone;
+  }
+  .box-title .title { display: inline; }
+  .box-title .title em { background: none; padding: 0; margin: 0; }
+  .center { align-items: center; text-align: center; }
+  /* 內文重點：底線色帶 */
+  .body em, .sub em, p em, .c em, .box em, .note em { font-weight: 700; background: linear-gradient(transparent 62%, var(--hl) 62%); }
+  .on-navy .body em, .on-navy .sub em { background: linear-gradient(transparent 62%, rgba(163,191,223,.45) 62%); }
+
+  .kicker { font-size: calc(var(--k) * 34px); font-weight: 500; color: var(--sub); letter-spacing: .06em; margin-bottom: 36px; }
+  .kicker span { border-bottom: 3px solid currentColor; padding-bottom: 6px; }
+  .body { font-size: calc(var(--k) * 36px); line-height: 1.75; color: var(--sub); white-space: pre-line; text-wrap: pretty; }
+  .latin { font-family: var(--f-latin), serif; }
+  .it { font-family: var(--f-latin), serif; font-style: italic; }
+
+  footer {
+    position: absolute; left: 96px; right: 96px; bottom: 70px; z-index: 4;
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 30px; color: var(--fg);
+  }
+  footer .page { font-size: 26px; letter-spacing: .1em; opacity: .8; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 12px;
+    border: 2px solid currentColor; border-radius: 999px; padding: 8px 26px;
+    font-size: 24px; letter-spacing: .08em;
+  }
+  .pill svg { width: 30px; height: 18px; }
+
+  /* 撕紙：clip-path 由 tear() 依實際尺寸產生 */
+  .paper { position: relative; background: var(--white); color: var(--navy); filter: drop-shadow(0 6px 10px rgba(0,0,0,.18)); }
+  .paper.beige { background: var(--paper); }
+  .paper.blue { background: var(--hl); }
+  .paper > .clip { position: absolute; inset: 0; overflow: hidden; }
+  .ghost {
+    position: absolute; left: -40px; right: -40px; z-index: 1;
+    font-family: var(--f-latin), serif; font-style: italic; font-size: 190px; line-height: .95;
+    color: var(--deep); white-space: nowrap; opacity: .7;
+  }
+  .scribble path { fill: none; stroke: var(--navy); stroke-width: 3.2; stroke-linecap: round; }
+  .on-navy .scribble path { stroke: var(--blue); }
+
+  /* cover */
+  .t-cover .frame { inset: 96px 96px 760px 96px; }
+  .t-cover .series { font-size: calc(var(--k) * 34px); font-weight: 500; color: var(--sub); letter-spacing: .06em; margin-bottom: 20px; }
+  .t-cover .title { font-size: calc(var(--k) * 112px); line-height: 1.28; }
+  .t-cover .sub { margin-top: 30px; align-self: flex-start; font-size: calc(var(--k) * 30px); padding: 10px 30px; }
+  .t-cover .shot { left: 170px; top: 640px; width: 760px; height: 560px; transform: rotate(-2deg); z-index: 2; }
+  .t-cover .shot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .t-cover .emblem { display: grid; place-items: center; height: 100%; font-family: var(--f-title); font-weight: 900; font-size: 300px; color: var(--navy); }
+  .t-cover .no { right: 96px; top: 104px; font-size: 40px; color: var(--navy); z-index: 3; }
+
+  /* statement */
+  .t-statement .frame { justify-content: center; }
+  .t-statement .title { font-size: calc(var(--k) * 112px); margin-bottom: 56px; }
+
+  /* compare */
+  .t-compare .title { font-size: calc(var(--k) * 78px); margin-bottom: 56px; }
+  .cmp { display: grid; grid-template-columns: 1fr 56px 1fr; row-gap: 22px; }
+  .cmp .h { font-size: calc(var(--k) * 30px); font-weight: 700; text-align: center; padding: 12px 0; letter-spacing: .12em; margin-bottom: 6px; border: 2px solid var(--navy); border-radius: 999px; }
+  .cmp .h.b { background: var(--navy); color: var(--paper); }
+  .cmp .c { padding: 30px 30px; font-size: calc(var(--k) * 34px); line-height: 1.45; display: flex; align-items: center; }
+  .cmp .c.a { color: var(--deep); }
+  .cmp .arr { display: grid; place-items: center; color: var(--navy); font-family: var(--f-latin); font-size: 44px; }
+
+  /* steps：活頁筆記紙 */
+  .t-steps .title { font-size: calc(var(--k) * 84px); margin-bottom: 52px; }
+  .note-sheet { padding: 44px 50px 44px 104px; transform: rotate(-1.2deg); }
+  .note-sheet .clip { background: repeating-linear-gradient(transparent 0 61px, rgba(19,63,112,.22) 61px 63px); }
+  .note-sheet .clip::before {
+    content: ""; position: absolute; left: 30px; top: 0; bottom: 0; width: 26px;
+    background: radial-gradient(circle at 13px 13px, var(--navy) 9px, transparent 10px) 0 18px / 26px 64px repeat-y;
+  }
+  .step { position: relative; display: flex; gap: 26px; align-items: baseline; padding: 20px 0; }
+  .step .n {
+    flex: none; width: 58px; height: 58px; border: 2.5px solid var(--navy); border-radius: 50%;
+    display: grid; place-items: center; transform: translateY(6px);
+    font-family: var(--f-latin); font-style: italic; font-size: calc(var(--k) * 34px);
+  }
+  .step h3 { font-family: var(--f-title); font-size: calc(var(--k) * 46px); font-weight: 700; margin-bottom: 6px; }
+  .step p { font-size: calc(var(--k) * 30px); color: var(--muted); line-height: 1.5; }
+
+  /* before / after */
+  .t-beforeafter .title { font-size: calc(var(--k) * 92px); margin-bottom: 48px; }
+  .box { padding: 40px 46px; font-size: calc(var(--k) * 36px); line-height: 1.65; text-wrap: pretty; }
+  .box .lab { font-family: var(--f-latin); font-style: italic; font-size: 38px; margin-bottom: 8px; }
+  .box.before { color: var(--muted); transform: rotate(1deg); margin-right: 60px; }
+  .box.after { transform: rotate(-1deg); margin-left: 40px; }
+  .down { display: flex; justify-content: center; margin: 18px 0; }
+  .down svg { width: 70px; height: 70px; }
+  .note { margin-top: 44px; align-self: flex-start; font-size: calc(var(--k) * 34px); font-weight: 700; background: var(--navy); color: var(--paper); padding: 14px 34px; border-radius: 999px; }
+  .note em { background: none; color: var(--hl); }
+
+  /* quote */
+  .t-quote .frame { justify-content: center; }
+  .t-quote .mark { font-family: var(--f-latin); font-style: italic; font-size: 340px; line-height: .8; height: 170px; color: var(--navy); }
+  .t-quote .title { font-size: calc(var(--k) * 100px); line-height: 1.4; }
+  .t-quote .by { margin-top: 64px; font-size: 40px; color: var(--muted); }
+
+  /* cta */
+  .t-cta .frame { justify-content: center; }
+  .avatar { position: relative; width: 360px; height: 360px; margin-bottom: 60px; }
+  .avatar .paper { position: absolute; inset: 0; }
+  .avatar .in { position: absolute; inset: 22px; border-radius: 50%; overflow: hidden; background: var(--blue); display: grid; place-items: center; font-family: var(--f-latin); font-size: 120px; color: var(--navy); }
+  .avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .t-cta .title { font-size: calc(var(--k) * 90px); }
+  .t-cta .body { margin-top: 36px; }
+  .btn { margin-top: 52px; background: var(--paper); color: var(--navy); font-size: calc(var(--k) * 38px); font-weight: 700; padding: 22px 60px; border-radius: 999px; letter-spacing: .06em; display: inline-flex; align-items: center; gap: 18px; }
+  .btn svg { width: 44px; height: 44px; }
+  .handle { margin-top: 34px; font-size: 40px; color: var(--sub); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+// **重點** → <em>重點</em>
+const hl = s => esc(s).replace(/\*\*([\s\S]+?)\*\*/g, '<em>$1</em>');
+const title = s => `<div class="tw"><div class="title">${hl(s)}</div></div>`;
+
+// 固定種子的亂數：同一篇每次輸出都一樣
+let seed = 1;
+const rnd = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+const R = (a, b) => a + rnd() * (b - a);
+
+// 亂線圈（參考圖裡人物背後的原子筆塗鴉）
+function scribble(w, h, loops = 9) {
+  let d = `M${R(.2, .4) * w} ${R(.3, .7) * h}`;
+  for (let i = 0; i < loops * 3; i++) {
+    const p = () => `${R(.02, .98) * w} ${R(.05, .95) * h}`;
+    d += ` C${p()} ${p()} ${p()}`;
+  }
+  return `<svg class="scribble" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><path d="${d}"/></svg>`;
+}
+
+// 白色小花＋枝條
+function flower(size, rot = 0) {
+  const petals = [0, 72, 144, 216, 288].map(a =>
+    `<ellipse cx="50" cy="28" rx="15" ry="22" transform="rotate(${a} 50 50)" fill="#FBF9F4" stroke="#9AA5B4" stroke-width="1.5"/>`).join('');
+  return `<svg width="${size}" height="${size}" viewBox="0 0 100 100" style="transform:rotate(${rot}deg)">
+    ${petals}<circle cx="50" cy="50" r="8" fill="#C9B26B"/><circle cx="50" cy="50" r="3.5" fill="#6B5A2E"/></svg>`;
+}
+const branch = (x, y, scale = 1, rot = 0, flip = false) => `
+  <div class="deco" style="left:${x}px;top:${y}px;transform:rotate(${rot}deg) scale(${flip ? -scale : scale},${scale});transform-origin:0 0;z-index:4">
+    <svg width="260" height="260" viewBox="0 0 260 260" style="position:absolute;left:0;top:0"><path d="M10 250 Q80 170 120 120 T230 30 M120 120 Q150 150 200 150 M80 170 Q60 120 70 80" fill="none" stroke="#5C4A3A" stroke-width="5" stroke-linecap="round"/>
+      <ellipse cx="190" cy="140" rx="22" ry="9" fill="#6F8A5E" transform="rotate(-20 190 140)"/><ellipse cx="66" cy="96" rx="20" ry="8" fill="#6F8A5E" transform="rotate(70 66 96)"/></svg>
+    <div style="position:absolute;left:180px;top:-10px">${flower(90, 15)}</div>
+    <div style="position:absolute;left:80px;top:70px">${flower(70, -20)}</div>
+    <div style="position:absolute;left:30px;top:20px">${flower(54, 40)}</div>
+  </div>`;
+const chat = `<svg viewBox="0 0 40 40"><path d="M6 8h28v20H16l-8 6v-6H6z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M12 15h16M12 21h10" stroke="currentColor" stroke-width="3"/></svg>`;
+const swipe = `<svg viewBox="0 0 30 18"><path d="M2 9h24M18 2l8 7-8 7" fill="none" stroke="currentColor" stroke-width="2.5"/></svg>`;
+const ghost = (word, top) => `<div class="ghost" style="top:${top}px">${[0, 1, 2].map(i => `<div style="margin-left:${-i * 160}px">${esc(word)} ${esc(word)}</div>`).join('')}</div>`;
+
+const LAYOUTS = {
+  cover: (s, p) => ({ bg: 'blue', html: `
+    <div class="deco" style="left:60px;top:560px;z-index:1">${scribble(960, 520, 10)}</div>
+    <div class="deco paper beige shot"><div class="clip">${s.photo ? `<img src="${esc(s.photo)}">` : `<div class="emblem">${esc(p.emblem || '')}</div>`}</div></div>
+    ${branch(860, 1010, .9, 0)}
+    <div class="deco no it">No.${esc(p.no)}</div>
+    <div class="frame">
+      <div class="series">${esc(p.series)}</div>
+      ${title(s.title)}
+      ${s.sub ? `<div class="sub pill">${hl(s.sub)}</div>` : ''}
+    </div>` }),
+  statement: (s, p) => ({ bg: 'navy', html: `
+    ${ghost(p.seriesEn || 'Tristan', 1000)}
+    ${branch(800, -40, 1, 20)}
+    <div class="frame">
+      ${s.kicker ? `<div class="kicker"><span>${hl(s.kicker)}</span></div>` : ''}
+      ${title(s.title)}
+      <div class="body">${hl(s.body)}</div>
+    </div>` }),
+  compare: s => ({ bg: 'paper', html: `
+    <div class="deco" style="right:-120px;top:-60px">${scribble(380, 300, 6)}</div>
+    <div class="frame">
+      ${title(s.title)}
+      <div class="cmp">
+        <div class="h a">${esc(s.a)}</div><div></div><div class="h b">${esc(s.b)}</div>
+        ${s.rows.map(([a, b]) => `<div class="c a paper blue">${hl(a)}</div><div class="arr">→</div><div class="c paper">${hl(b)}</div>`).join('')}
+      </div>
+    </div>` }),
+  steps: s => ({ bg: 'navy', html: `
+    ${branch(-30, 1080, 1, -10)}
+    ${branch(900, 330, .7, 30)}
+    <div class="frame box-title">
+      ${title(s.title)}
+      <div class="paper note-sheet"><div class="clip"></div>
+        ${s.items.map(([h, d], i) => `<div class="step"><div class="n">${i + 1}</div><div><h3>${hl(h)}</h3><p>${hl(d)}</p></div></div>`).join('')}
+      </div>
+    </div>` }),
+  beforeafter: s => ({ bg: 'blue', html: `
+    <div class="deco" style="left:-160px;top:900px">${scribble(420, 380, 7)}</div>
+    <div class="frame">
+      ${title(s.title)}
+      <div class="box paper beige before"><div class="lab">Before</div>${hl(s.before)}</div>
+      <div class="down"><svg viewBox="0 0 70 70"><path d="M20 8 Q48 30 34 60 M18 46 L34 62 L50 44" fill="none" stroke="var(--navy)" stroke-width="4" stroke-linecap="round"/></svg></div>
+      <div class="box paper after"><div class="lab">After</div>${hl(s.after)}</div>
+      ${s.note ? `<div class="note">${hl(s.note)}</div>` : ''}
+    </div>` }),
+  quote: (s, p, t) => ({ bg: 'paper', html: `
+    <div class="deco" style="right:-80px;top:-40px">${scribble(420, 360, 8)}</div>
+    ${branch(-40, 1020, 1.1, -5)}
+    <div class="frame">
+      <div class="mark">“</div>
+      ${title(s.text)}
+      <div class="by it">— ${esc(t.author)}</div>
+    </div>` }),
+  cta: (s, p, t) => ({ bg: 'navy', html: `
+    <div class="deco" style="left:250px;top:40px">${scribble(580, 440, 8)}</div>
+    ${branch(760, 860, .9, 0)}
+    <div class="frame center">
+      <div class="avatar"><div class="paper beige"></div><div class="in">${t.avatar ? `<img src="${esc(t.avatar)}">` : esc(t.author[0])}</div></div>
+      ${title(s.title)}
+      ${s.body ? `<div class="body">${hl(s.body)}</div>` : ''}
+      ${s.button ? `<div class="btn">${chat}${hl(s.button)}</div>` : ''}
+      <div class="handle it">${esc(t.handle)}</div>
+    </div>` }),
+};
+
+// 撕紙邊：沿四邊取點、往內隨機縮
+function tear(el) {
+  const w = el.offsetWidth, h = el.offsetHeight, a = el.closest('.avatar') ? 0 : 7;
+  if (el.closest('.avatar')) {
+    const pts = [];
+    for (let i = 0; i < 90; i++) { const t = i / 90 * Math.PI * 2, r = 50 - R(0, 3.2); pts.push(`${50 + r * Math.cos(t)}% ${50 + r * Math.sin(t)}%`); }
+    el.style.clipPath = `polygon(${pts.join(',')})`;
+    return;
+  }
+  const pts = [], step = 14;
+  for (let x = 0; x <= w; x += step) pts.push(`${x}px ${R(0, a)}px`);
+  for (let y = 0; y <= h; y += step) pts.push(`${w - R(0, a)}px ${y}px`);
+  for (let x = w; x >= 0; x -= step) pts.push(`${x}px ${h - R(0, a)}px`);
+  for (let y = h; y >= 0; y -= step) pts.push(`${R(0, a)}px ${y}px`);
+  el.style.clipPath = `polygon(${pts.join(',')})`;
+}
+
+// 內容超出就整張等比縮字
+function settle(slide) {
+  const frame = slide.querySelector('.frame');
+  let k = 1;
+  while (frame.scrollHeight > frame.clientHeight + 1 && k > 0.6) {
+    k = +(k - 0.04).toFixed(2);
+    slide.style.setProperty('--k', k);
+  }
+  return { k, overflow: frame.scrollHeight > frame.clientHeight + 1 };
+}
+
+window.render = (theme, post) => {
+  const s = document.documentElement.style;
+  const [w, h] = theme.size;
+  s.setProperty('--w', w + 'px'); s.setProperty('--h', h + 'px');
+  for (const [k, v] of Object.entries(theme.colors)) s.setProperty('--' + k, v);
+  s.setProperty('--f-title', theme.fonts.title);
+  s.setProperty('--f-body', theme.fonts.body);
+  s.setProperty('--f-latin', theme.fonts.latin);
+  s.setProperty('--title-w', theme.fonts.titleWeight);
+
+  seed = 2049;
+  const n = post.slides.length;
+  document.getElementById('root').innerHTML = post.slides.map((sl, i) => {
+    const layout = LAYOUTS[sl.type];
+    if (!layout) throw new Error(`第 ${i + 1} 張：沒有「${sl.type}」這種版型`);
+    const { bg, html } = layout(sl, post, theme);
+    const last = i === n - 1;
+    return `<section class="slide t-${sl.type} on-${bg}">
+      ${html}
+      <footer>
+        <div class="it">${esc(post.seriesEn || '')}</div>
+        <span class="page latin">${String(i + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}</span>
+        ${last ? '<span></span>' : `<span class="pill">左滑 ${swipe}</span>`}
+      </footer>
+    </section>`;
+  }).join('');
+};
+
+window.settleAll = () => {
+  const fits = [...document.querySelectorAll('.slide')].map(settle);
+  seed = 7;
+  document.querySelectorAll('.paper').forEach(tear);
+  return fits;
+};
+</script>
+</body>
+</html>
