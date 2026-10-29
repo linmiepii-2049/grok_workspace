@@ -1,0 +1,23 @@
+{
+  "name": "文青米白",
+  "size": [1080, 1350],
+  "colors": {
+    "bg": "#F5EFE7",
+    "ink": "#3A3836",
+    "muted": "#8E8780",
+    "teal": "#6E9E9B",
+    "coral": "#D2483A",
+    "apricot": "#EDB27A",
+    "card": "#FBF8F3"
+  },
+  "fonts": {
+    "css": "https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@200;300;400;500;700&family=Montserrat:wght@500;700;800&display=block",
+    "title": "'Noto Sans TC'",
+    "titleWeight": 200,
+    "titleStretch": 1.18,
+    "body": "'Noto Sans TC'",
+    "latin": "'Montserrat'"
+  },
+  "author": "Tristan",
+  "handle": "@tristan"
+}
