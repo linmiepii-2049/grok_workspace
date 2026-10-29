@@ -1,4 +1,4 @@
-// 投資追蹤前端：無框架；分頁用 hash：#overview · #holdings · #realized · #briefs · #briefs/<日期> · #calendar
+// 投資追蹤前端：無框架；分頁用 hash：#overview · #realized · #briefs · #briefs/<日期> · #calendar
 const app = document.getElementById("app");
 const tip = document.querySelector(".pf-tip");
 
@@ -33,8 +33,6 @@ const usd = (n, { sign = false, cents = true } = {}) => {
 };
 const qty = (n) =>
   Number(n).toLocaleString("zh-TW", { maximumFractionDigits: 4 });
-const px = (n) =>
-  Number(n).toLocaleString("zh-TW", { maximumFractionDigits: 2 });
 
 // 漲跌：紅漲綠跌＋▲▼，不只靠顏色
 const move = (n, text) =>
@@ -326,7 +324,6 @@ addEventListener("resize", () => {
 
 const TABS = [
   ["overview", "總覽"],
-  ["holdings", "持股"],
   ["realized", "已實現"],
   ["briefs", "晨報"],
   ["calendar", "行事曆"],
@@ -468,8 +465,18 @@ function allocBars(rows, total) {
 // 各市場用自己的幣別：市值、今日漲跌、未實現（美股只算股價部分，匯率影響只反映在台幣總資產）
 // 未實現扣掉預估賣出手續費與證交稅（sell_cost，原幣），和券商的「參考損益」一致
 const MARKET = {
-  TWD: { title: "台股", unit: "元", fmt: (n, o) => twd(n, o), short: (n, o) => twd(n, o) },
-  USD: { title: "美股", unit: "美元", fmt: (n, o) => usd(n, o), short: (n, o) => usd(n, { ...o, cents: false }) },
+  TWD: {
+    title: "台股",
+    unit: "元",
+    fmt: (n, o) => twd(n, o),
+    short: (n, o) => twd(n, o),
+  },
+  USD: {
+    title: "美股",
+    unit: "美元",
+    fmt: (n, o) => usd(n, o),
+    short: (n, o) => usd(n, { ...o, cents: false }),
+  },
 };
 
 function marketSection(ccy, cash) {
@@ -542,37 +549,22 @@ function tableView(head, rows) {
       .join("")}</tbody></table></div></details>`;
 }
 
-function holdings() {
+// 晨報分頁底下：每檔持股一個可展開的新聞清單，展開時才載入
+function holdingNews() {
   const ps = summary.positions;
-  if (!ps.length) return `<p class="empty-state">目前沒有持股。</p>`;
-  return `<div class="pf-holdings">${ps
-    .map((p) => {
-      const chg = p.prev_close ? p.close / p.prev_close - 1 : null;
-      const usd = p.currency === "USD";
-      return `<article class="pf-holding">
-        <header>
-          <h3>${esc(p.name)}<span class="mono">${esc(p.symbol)}</span></h3>
-          ${move(chg, pct(chg))}
-        </header>
-        <dl>
-          <dt>市值（台幣）</dt><dt>未實現損益</dt>
-          <dd class="num">${twd(p.market_value)}</dd>
-          <dd>${move(p.unrealized, twd(p.unrealized, { sign: true }))}${p.cost ? ` <span class="num">（${pct(p.unrealized / p.cost)}）</span>` : ""}</dd>
-          <dt>股數 · 帳戶</dt><dt>收盤 / 成本均價${usd ? "（美元）" : ""}</dt>
-          <dd class="num">${qty(p.shares)} · ${esc(p.account)}</dd>
-          <dd class="num">${px(p.close)} / ${px(p.avg_cost)}</dd>
-          ${
-            usd
-              ? `<dt>股價損益</dt><dt>匯率損益</dt>
-          <dd>${move(p.unreal_price, twd(p.unreal_price, { sign: true }))}</dd>
-          <dd>${move(p.unreal_fx, twd(p.unreal_fx, { sign: true }))}</dd>`
-              : ""
-          }
-        </dl>
-        <details data-news="${esc(p.symbol)}"><summary>相關新聞</summary><div class="news-body"><p class="mono">載入中…</p></div></details>
-      </article>`;
-    })
-    .join("")}</div>`;
+  if (!ps.length) return "";
+  return `<section class="pf-card pf-newsgroup">
+    <h2>持股新聞</h2>
+    ${ps
+      .map((p) => {
+        const chg = p.prev_close ? p.close / p.prev_close - 1 : null;
+        return `<details data-news="${esc(p.symbol)}">
+          <summary><span>${esc(p.name)}<span class="mono">${esc(p.symbol.replace(/\.TWO?$/, ""))}</span></span>${move(chg, pct(chg))}</summary>
+          <div class="news-body"><p class="mono">載入中…</p></div>
+        </details>`;
+      })
+      .join("")}
+  </section>`;
 }
 
 async function loadNews(details) {
@@ -629,17 +621,21 @@ async function briefs(date) {
   if (date) {
     const b = await api(`/api/portfolio/briefs/${encodeURIComponent(date)}`);
     return `<p><a class="back" href="#briefs">← 所有晨報</a></p>
-      <article class="pf-article"><span class="mono">${esc(b.date)}（${weekday(b.date)}）· ${esc(b.model)}</span>${markdown(b.body)}</article>`;
+      <article class="pf-article"><span class="mono">${esc(b.date)}（${weekday(b.date)}）· ${esc(b.model)}</span>${markdown(b.body)}</article>
+      ${holdingNews()}`;
   }
   const list = await api("/api/portfolio/briefs");
-  return list.length
-    ? `<ul class="pf-list">${list
-        .map(
-          (b) =>
-            `<li><a href="#briefs/${esc(b.date)}"><span class="mono">${esc(b.date)}（${weekday(b.date)}）</span><strong>${esc(b.title)}</strong></a></li>`,
-        )
-        .join("")}</ul>`
-    : `<p class="empty-state">還沒有晨報。排程在週二到週六早上 6 點產生。</p>`;
+  return (
+    (list.length
+      ? `<ul class="pf-list">${list
+          .map(
+            (b) =>
+              `<li><a href="#briefs/${esc(b.date)}"><span class="mono">${esc(b.date)}（${weekday(b.date)}）</span><strong>${esc(b.title)}</strong></a></li>`,
+          )
+          .join("")}</ul>`
+      : `<p class="empty-state">還沒有晨報。排程在週二到週六早上 6 點產生。</p>`) +
+    holdingNews()
+  );
 }
 
 const KIND_LABEL = {
@@ -692,8 +688,7 @@ async function render() {
   try {
     summary ??= await api("/api/portfolio/summary");
     let body;
-    if (tab === "holdings") body = holdings();
-    else if (tab === "realized") body = realized();
+    if (tab === "realized") body = realized();
     else if (tab === "briefs") body = await briefs(arg);
     else if (tab === "calendar") body = await calendar();
     else body = overview();

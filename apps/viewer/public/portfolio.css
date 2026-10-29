@@ -348,71 +348,32 @@ table.pf th {
   background: var(--ink-3);
 }
 
-/* ---------- 持股 ---------- */
+/* ---------- 持股新聞（晨報分頁） ---------- */
 
-.pf-holdings {
-  display: grid;
-  gap: 10px;
+.pf-newsgroup {
+  margin-top: 16px;
 }
 
-@media (min-width: 720px) {
-  .pf-holdings {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+.pf-newsgroup details {
+  border-top: 1px solid var(--rule);
 }
 
-.pf-holding {
-  border: 1px solid var(--rule);
-  border-radius: var(--radius);
-  padding: 12px;
-  min-width: 0;
-}
-
-.pf-holding header {
+.pf-newsgroup summary {
+  cursor: pointer;
+  min-height: 44px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
   gap: 10px;
-  align-items: baseline;
+  font-size: 15px;
 }
 
-.pf-holding h3 {
-  margin: 0;
-  font-size: 17px;
-}
-
-.pf-holding h3 .mono {
+.pf-newsgroup summary .mono {
   margin-left: 6px;
 }
 
-.pf-holding dl {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 6px 12px;
-  margin: 10px 0 0;
-}
-
-.pf-holding dt {
-  font-size: 12px;
-  color: var(--ink-3);
-}
-
-.pf-holding dd {
-  margin: 0;
-  font-size: 14px;
-}
-
-.pf-holding details {
-  margin-top: 10px;
-  border-top: 1px solid var(--rule);
-  padding-top: 4px;
-}
-
-.pf-holding summary {
-  cursor: pointer;
-  min-height: 40px;
-  display: flex;
-  align-items: center;
-  font-size: 14px;
+.pf-newsgroup .news-body {
+  padding: 2px 0 12px;
 }
 
 /* ---------- 新聞、晨報、行事曆 ---------- */
