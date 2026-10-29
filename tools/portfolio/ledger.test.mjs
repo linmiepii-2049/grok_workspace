@@ -45,6 +45,16 @@ test("台股賣出：預設手續費 0.1425%、證交稅 0.3%，平均成本法"
   assert.equal(snapshots[1].cash, 100000 + gross - fee - tax + 30000);
 });
 
+test("未實現損益扣掉預估賣出手續費與證交稅", () => {
+  const [, second] = run(base()).snapshots;
+  // 2330 收 110：市值 110000，預估手續費 156、證交稅 330
+  const p = second.positions[0];
+  assert.equal(p.sell_cost, 156 + 330);
+  assert.equal(p.unrealized, 110000 - 486 - 100000);
+  assert.equal(second.unrealized, 110000 - 486 - 100000);
+  assert.equal(second.market_value, 110000);
+});
+
 test("美股損益拆成股價與匯率", () => {
   const { realized } = run(
     base([
