@@ -1,0 +1,42 @@
+# Tristan Reels
+
+字卡短影音（9:16）。每集只寫 `episode.json`，畫面由 `kit/` 的元件組成；旁白用 MiniMax（`Chinese_casual_instructor_nv1`）。
+
+## 一集的資料夾
+
+| 檔案              | 內容                                              |
+| ----------------- | ------------------------------------------------- |
+| `BRIEF.md`        | 需求                                              |
+| `STORYBOARD.md`   | 分鏡                                              |
+| `voiceover.json`  | 旁白稿，一行一句，id 給 episode.json 對時間用     |
+| `episode.json`    | 這集用哪些場景元件、填什麼內容、對到哪句旁白      |
+| `9x16/`           | build.mjs 產生的 HyperFrames 專案，不要手改       |
+
+## 流程
+
+1. 寫 `voiceover.json` 和 `episode.json`
+2. `node reels/kit/build.mjs reels/<集>`：沒有旁白時用字數估算時間，先看畫面
+3. 推上 `voiceover.json`，GitHub Actions 的 `tts` workflow 產生旁白並 commit 回來；`git pull --rebase`
+4. `node .claude/skills/motion-video/scripts/vo-timeline.mjs <集>/voiceover.json --max 14`，再跑一次 build.mjs，動畫自動對齊真實旁白
+5. 自檢、渲染照 motion-video skill
+
+## 場景元件（`kit/scenes/`）
+
+| 元件           | 用途                                       | 主要欄位                                    |
+| -------------- | ------------------------------------------ | ------------------------------------------- |
+| `hook-canned`  | 鉤子：太短的 Prompt 換來罐頭回覆，蓋章劃掉 | prompt、reply、stamp、title                 |
+| `equation`     | 比喻等式 A ＝ B，下面排出空標籤槽          | top、bottom、slots                          |
+| `prompt-build` | Prompt 逐段長出來，回覆卡一版一版改寫      | rows（tag、text、line、at）、replies        |
+| `before-after` | 前後對比加大數字                           | before、after、stats（pre、num、post、at）  |
+| `pick-edit`    | 人的判斷：圈選一版、改一句，接大標         | a、b（`[[要改的句子]]`）、fix、title        |
+| `end-card`     | 片尾 CTA：形象照、帳號、留言關鍵字         | title、sub                                  |
+
+- 時間欄位都寫成「旁白裡的某個詞」（例如 `"titleAt": "問題"`），build.mjs 換算成秒數；換聲音、改稿都不用手改時間
+- `**重點**` 會變成磚紅強調色；每個畫面只用一處
+- 新元件：在 `kit/scenes/` 加一個檔案，動態只用 `kit/lib.mjs` 的 `mv`（打字、遮罩揭開、手繪線、蓋章、彈出、數字跳動），不要每集重寫 GSAP
+
+## 品牌層（`kit/brand.css`、build.mjs）
+
+- 配色同輪播 `beige-teal`；灰綠文字用 `--teal-ink`、白字底用 `--teal-deep`，原色對比不足
+- 上方系列標（代表字＋英文＋編號）、下方字幕、最下方杏橘斜紋與灰綠圓點裝飾，每集固定
+- 1330px 以下只放裝飾，避開各平台的按鈕和說明文字

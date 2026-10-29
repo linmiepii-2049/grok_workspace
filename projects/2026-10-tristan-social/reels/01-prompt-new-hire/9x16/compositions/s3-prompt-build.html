@@ -1,0 +1,152 @@
+<!-- build.mjs 產生，不要手改：改 episode.json 或 kit/scenes/prompt-build.mjs 後重跑 -->
+<template>
+  <style>
+    @font-face { font-family: "Noto Sans TC"; src: url("assets/fonts/NotoSansTC-200.woff2") format("woff2"); font-weight: 200; }
+      @font-face { font-family: "Noto Sans TC"; src: url("assets/fonts/NotoSansTC-300.woff2") format("woff2"); font-weight: 300; }
+      @font-face { font-family: "Noto Sans TC"; src: url("assets/fonts/NotoSansTC-400.woff2") format("woff2"); font-weight: 400; }
+      @font-face { font-family: "Noto Sans TC"; src: url("assets/fonts/NotoSansTC-500.woff2") format("woff2"); font-weight: 500; }
+/* Tristan Reels 品牌層：配色、字型、共用元件樣式。每個場景都會內嵌一份 */
+:root {
+  --bg: #f5efe7;
+  --ink: #3a3836;
+  --muted: #8e8780;
+  --teal: #6e9e9b;
+  /* 灰綠原色在米白底上對比不足：文字用 teal-ink，白字底色用 teal-deep */
+  --teal-ink: #557f7c;
+  --teal-deep: #5b8986;
+  --coral: #d2483a;
+  --apricot: #edb27a;
+  --card: #fbf8f3;
+  --zh: "Noto Sans TC", sans-serif;
+  --latin: "Montserrat", "Noto Sans TC", sans-serif;
+}
+#root { position: absolute; inset: 0; font-family: var(--zh); color: var(--ink); line-break: strict; }
+em { font-style: normal; color: var(--coral); }
+.abs { position: absolute; }
+.latin { font-family: var(--latin); }
+
+/* 卡片：輸入框、回覆卡共用 */
+.k-card {
+  position: absolute; left: 80px; right: 80px;
+  background: var(--card); border: 1.5px solid rgba(58, 56, 54, 0.14); border-radius: 28px;
+  box-shadow: 0 12px 32px rgba(58, 56, 54, 0.1);
+  padding: 34px 40px;
+}
+.k-head { display: flex; align-items: center; gap: 18px; margin-bottom: 18px; }
+.k-who {
+  width: 56px; height: 56px; border-radius: 50%; flex: none;
+  display: flex; align-items: center; justify-content: center;
+  font: 500 28px/1 var(--latin); color: #fff; background: var(--teal-deep);
+}
+.k-who.ai { background: var(--apricot); color: var(--ink); }
+.k-who-name { font: 500 30px/1 var(--zh); color: var(--muted); letter-spacing: 0.06em; }
+.k-prompt-text { font: 400 50px/1.45 var(--zh); letter-spacing: 0.02em; }
+.k-reply-body { font: 300 38px/1.6 var(--zh); letter-spacing: 0.02em; white-space: pre-line; }
+
+/* 大標：思源黑體 Thin 拉長 1.18 倍。GSAP 只動外層，拉長放在內層 */
+.k-title { position: absolute; left: 60px; right: 60px; text-align: center; }
+.k-title .s {
+  display: inline-block; transform: scaleY(1.18); transform-origin: 50% 0;
+  font: 200 124px/1.12 var(--zh); letter-spacing: 0.04em; white-space: pre-line;
+}
+.k-title em { font-weight: 300; }
+
+/* 標籤與空槽：方角，不用膠囊形 */
+.k-tag {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 132px; height: 64px; padding: 0 16px; border-radius: 10px;
+  font: 500 32px/1 var(--zh); letter-spacing: 0.08em;
+  border: 3px dashed var(--teal); color: var(--teal-ink); background: transparent;
+}
+.k-tag { position: relative; }
+.k-tag .fill {
+  position: absolute; inset: -3px; border-radius: 10px; opacity: 0;
+  display: flex; align-items: center; justify-content: center; background: var(--teal-deep); color: #fff;
+}
+
+/* 手繪線條：路徑設 pathLength="1"，用 stroke-dashoffset 畫出來 */
+.k-ink { position: absolute; overflow: visible; pointer-events: none; }
+.k-ink path { fill: none; stroke: var(--coral); stroke-width: 9; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 1; }
+
+/* 印章 */
+.k-stamp {
+  position: absolute; padding: 10px 22px; border: 5px solid var(--coral); border-radius: 12px;
+  font: 500 52px/1 var(--zh); letter-spacing: 0.1em; color: var(--coral); background: rgba(251, 248, 243, 0.85);
+}
+
+/* 大數字 */
+.k-num { font: 800 180px/1 var(--latin); color: var(--coral); letter-spacing: -0.02em; }
+
+.ch { opacity: 0; }
+
+  </style>
+  <div id="root" data-composition-id="s3-prompt-build" data-width="1080" data-height="1920">
+  <div id="b-prompt" class="k-card" style="top:240px">
+    <div class="k-head"><span class="k-who">你</span><span class="k-who-name">我的 Prompt</span></div>
+    <div style="display:flex;align-items:center;gap:24px;height:96px">
+      <span id="b-tag0" class="k-tag" style="flex:none"><span class="lbl">角色</span><span class="fill">角色</span></span>
+      <div id="b-text0" style="font:400 44px/1.3 var(--zh);letter-spacing:.02em"><span class="ch">你</span><span class="ch">是</span><span class="ch">我</span><span class="ch">的</span><span class="ch">秘</span><span class="ch">書</span><span class="ch">。</span></div>
+    </div><div style="display:flex;align-items:center;gap:24px;height:96px">
+      <span id="b-tag1" class="k-tag" style="flex:none"><span class="lbl">背景</span><span class="fill">背景</span></span>
+      <div id="b-text1" style="font:400 44px/1.3 var(--zh);letter-spacing:.02em"><span class="ch">週</span><span class="ch">五</span><span class="ch">家</span><span class="ch">裡</span><span class="ch">有</span><span class="ch">事</span><span class="ch">，</span><span class="ch">要</span><span class="ch">請</span><span class="ch">一</span><span class="ch">天</span><span class="ch">。</span></div>
+    </div><div style="display:flex;align-items:center;gap:24px;height:96px">
+      <span id="b-tag2" class="k-tag" style="flex:none"><span class="lbl">任務</span><span class="fill">任務</span></span>
+      <div id="b-text2" style="font:400 44px/1.3 var(--zh);letter-spacing:.02em"><span class="ch">寫</span><span class="ch">一</span><span class="ch">封</span><span class="ch">請</span><span class="ch">假</span><span class="ch">信</span><span class="ch">給</span><span class="ch">主</span><span class="ch">管</span><span class="ch">。</span></div>
+    </div><div style="display:flex;align-items:center;gap:24px;height:96px">
+      <span id="b-tag3" class="k-tag" style="flex:none"><span class="lbl">格式</span><span class="fill">格式</span></span>
+      <div id="b-text3" style="font:400 44px/1.3 var(--zh);letter-spacing:.02em"><span class="ch">語</span><span class="ch">氣</span><span class="ch">客</span><span class="ch">氣</span><span class="ch">，</span><span class="ch">1</span><span class="ch">0</span><span class="ch">0</span><span class="ch"> </span><span class="ch">字</span><span class="ch">以</span><span class="ch">內</span><span class="ch">。</span></div>
+    </div>
+  </div>
+  <div id="b-reply" class="k-card" style="top:790px;height:340px">
+    <div class="k-head"><span class="k-who ai">AI</span><span class="k-who-name">AI 回覆</span>
+      <span style="margin-left:auto;position:relative;width:90px;height:44px">
+        <span id="b-v0" class="abs latin" style="right:0;top:0;font:800 34px/44px var(--latin);color:var(--teal-ink);opacity:1">v0</span><span id="b-v1" class="abs latin" style="right:0;top:0;font:800 34px/44px var(--latin);color:var(--teal-ink);opacity:0">v1</span><span id="b-v2" class="abs latin" style="right:0;top:0;font:800 34px/44px var(--latin);color:var(--teal-ink);opacity:0">v2</span><span id="b-v3" class="abs latin" style="right:0;top:0;font:800 34px/44px var(--latin);color:var(--teal-ink);opacity:0">v3</span><span id="b-v4" class="abs latin" style="right:0;top:0;font:800 34px/44px var(--latin);color:var(--coral);opacity:0">v4</span>
+      </span>
+    </div>
+    <div style="position:relative">
+      <div id="b-r0" class="k-reply-body abs" style="left:0;right:0;top:0;font-size:38px;line-height:1.55;opacity:1;color:var(--muted)">主管您好：
+本人因個人因素，需請假一天。</div><div id="b-r1" class="k-reply-body abs" style="left:0;right:0;top:0;font-size:38px;line-height:1.55;opacity:0">主管您好：
+我是秘書，代為申請請假一天。</div><div id="b-r2" class="k-reply-body abs" style="left:0;right:0;top:0;font-size:38px;line-height:1.55;opacity:0">主管您好：
+週五家中有事，需請假一天。</div><div id="b-r3" class="k-reply-body abs" style="left:0;right:0;top:0;font-size:38px;line-height:1.55;opacity:0">經理您好：
+週五家裡有事，想跟您請假一天。</div><div id="b-r4" class="k-reply-body abs" style="left:0;right:0;top:0;font-size:38px;line-height:1.55;opacity:0">經理您好：
+週五家裡臨時有事，想跟您請一天假，
+工作會先安排好，謝謝您！</div>
+    </div>
+  </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#b-prompt", { clipPath: "inset(0% 0% 100% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.45, ease: "power3.out" }, 0);
+    tl.fromTo("#b-reply", { clipPath: "inset(0% 0% 100% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.45, ease: "power3.out" }, 0.15);
+    tl.fromTo("#b-tag0 .fill", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2.4)" }, 0.45); tl.fromTo("#b-tag0 .lbl", { opacity: 1 }, { opacity: 0, duration: 0.01 }, 0.6);
+    { const cs = document.querySelectorAll("#b-text0 .ch"); tl.fromTo(cs, { opacity: 0 }, { opacity: 1, duration: 0.01, ease: "none", stagger: 1.358 / Math.max(cs.length, 1) }, 1.642); }
+    tl.to("#b-r0", { opacity: 0, duration: 0.15, ease: "power2.in" }, 3.2);
+    tl.fromTo("#b-r1", { clipPath: "inset(0% 100% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.5, ease: "power2.inOut" }, 3.3);
+    tl.fromTo("#b-r1", { opacity: 0 }, { opacity: 1, duration: 0.01 }, 3.3);
+    tl.to("#b-v0", { opacity: 0, duration: 0.1, ease: "power2.in" }, 3.2);
+    tl.fromTo("#b-v1", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2.2)" }, 3.3);
+    tl.fromTo("#b-tag1 .fill", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2.4)" }, 3.5); tl.fromTo("#b-tag1 .lbl", { opacity: 1 }, { opacity: 0, duration: 0.01 }, 3.65);
+    { const cs = document.querySelectorAll("#b-text1 .ch"); tl.fromTo(cs, { opacity: 0 }, { opacity: 1, duration: 0.01, ease: "none", stagger: 2.383 / Math.max(cs.length, 1) }, 4.667); }
+    tl.to("#b-r1", { opacity: 0, duration: 0.15, ease: "power2.in" }, 7.25);
+    tl.fromTo("#b-r2", { clipPath: "inset(0% 100% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.5, ease: "power2.inOut" }, 7.35);
+    tl.fromTo("#b-r2", { opacity: 0 }, { opacity: 1, duration: 0.01 }, 7.35);
+    tl.to("#b-v1", { opacity: 0, duration: 0.1, ease: "power2.in" }, 7.25);
+    tl.fromTo("#b-v2", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2.2)" }, 7.35);
+    tl.fromTo("#b-tag2 .fill", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2.4)" }, 7.55); tl.fromTo("#b-tag2 .lbl", { opacity: 1 }, { opacity: 0, duration: 0.01 }, 7.7);
+    { const cs = document.querySelectorAll("#b-text2 .ch"); tl.fromTo(cs, { opacity: 0 }, { opacity: 1, duration: 0.01, ease: "none", stagger: 1.975 / Math.max(cs.length, 1) }, 8.725); }
+    tl.to("#b-r2", { opacity: 0, duration: 0.15, ease: "power2.in" }, 10.9);
+    tl.fromTo("#b-r3", { clipPath: "inset(0% 100% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.5, ease: "power2.inOut" }, 11);
+    tl.fromTo("#b-r3", { opacity: 0 }, { opacity: 1, duration: 0.01 }, 11);
+    tl.to("#b-v2", { opacity: 0, duration: 0.1, ease: "power2.in" }, 10.9);
+    tl.fromTo("#b-v3", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2.2)" }, 11);
+    tl.fromTo("#b-tag3 .fill", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2.4)" }, 11.2); tl.fromTo("#b-tag3 .lbl", { opacity: 1 }, { opacity: 0, duration: 0.01 }, 11.35);
+    { const cs = document.querySelectorAll("#b-text3 .ch"); tl.fromTo(cs, { opacity: 0 }, { opacity: 1, duration: 0.01, ease: "none", stagger: 2.179 / Math.max(cs.length, 1) }, 12.371); }
+    tl.to("#b-r3", { opacity: 0, duration: 0.15, ease: "power2.in" }, 14.75);
+    tl.fromTo("#b-r4", { clipPath: "inset(0% 100% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.5, ease: "power2.inOut" }, 14.85);
+    tl.fromTo("#b-r4", { opacity: 0 }, { opacity: 1, duration: 0.01 }, 14.85);
+    tl.to("#b-v3", { opacity: 0, duration: 0.1, ease: "power2.in" }, 14.75);
+    tl.fromTo("#b-v4", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2.2)" }, 14.85);
+    tl.set({}, {}, 14.6);
+    window.__timelines["s3-prompt-build"] = tl;
+  </script>
+</template>

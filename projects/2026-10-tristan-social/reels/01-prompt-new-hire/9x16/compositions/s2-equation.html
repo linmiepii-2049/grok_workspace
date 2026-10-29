@@ -1,0 +1,101 @@
+<!-- build.mjs 產生，不要手改：改 episode.json 或 kit/scenes/equation.mjs 後重跑 -->
+<template>
+  <style>
+    @font-face { font-family: "Noto Sans TC"; src: url("assets/fonts/NotoSansTC-200.woff2") format("woff2"); font-weight: 200; }
+      @font-face { font-family: "Noto Sans TC"; src: url("assets/fonts/NotoSansTC-300.woff2") format("woff2"); font-weight: 300; }
+      @font-face { font-family: "Noto Sans TC"; src: url("assets/fonts/NotoSansTC-400.woff2") format("woff2"); font-weight: 400; }
+      @font-face { font-family: "Noto Sans TC"; src: url("assets/fonts/NotoSansTC-500.woff2") format("woff2"); font-weight: 500; }
+/* Tristan Reels 品牌層：配色、字型、共用元件樣式。每個場景都會內嵌一份 */
+:root {
+  --bg: #f5efe7;
+  --ink: #3a3836;
+  --muted: #8e8780;
+  --teal: #6e9e9b;
+  /* 灰綠原色在米白底上對比不足：文字用 teal-ink，白字底色用 teal-deep */
+  --teal-ink: #557f7c;
+  --teal-deep: #5b8986;
+  --coral: #d2483a;
+  --apricot: #edb27a;
+  --card: #fbf8f3;
+  --zh: "Noto Sans TC", sans-serif;
+  --latin: "Montserrat", "Noto Sans TC", sans-serif;
+}
+#root { position: absolute; inset: 0; font-family: var(--zh); color: var(--ink); line-break: strict; }
+em { font-style: normal; color: var(--coral); }
+.abs { position: absolute; }
+.latin { font-family: var(--latin); }
+
+/* 卡片：輸入框、回覆卡共用 */
+.k-card {
+  position: absolute; left: 80px; right: 80px;
+  background: var(--card); border: 1.5px solid rgba(58, 56, 54, 0.14); border-radius: 28px;
+  box-shadow: 0 12px 32px rgba(58, 56, 54, 0.1);
+  padding: 34px 40px;
+}
+.k-head { display: flex; align-items: center; gap: 18px; margin-bottom: 18px; }
+.k-who {
+  width: 56px; height: 56px; border-radius: 50%; flex: none;
+  display: flex; align-items: center; justify-content: center;
+  font: 500 28px/1 var(--latin); color: #fff; background: var(--teal-deep);
+}
+.k-who.ai { background: var(--apricot); color: var(--ink); }
+.k-who-name { font: 500 30px/1 var(--zh); color: var(--muted); letter-spacing: 0.06em; }
+.k-prompt-text { font: 400 50px/1.45 var(--zh); letter-spacing: 0.02em; }
+.k-reply-body { font: 300 38px/1.6 var(--zh); letter-spacing: 0.02em; white-space: pre-line; }
+
+/* 大標：思源黑體 Thin 拉長 1.18 倍。GSAP 只動外層，拉長放在內層 */
+.k-title { position: absolute; left: 60px; right: 60px; text-align: center; }
+.k-title .s {
+  display: inline-block; transform: scaleY(1.18); transform-origin: 50% 0;
+  font: 200 124px/1.12 var(--zh); letter-spacing: 0.04em; white-space: pre-line;
+}
+.k-title em { font-weight: 300; }
+
+/* 標籤與空槽：方角，不用膠囊形 */
+.k-tag {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 132px; height: 64px; padding: 0 16px; border-radius: 10px;
+  font: 500 32px/1 var(--zh); letter-spacing: 0.08em;
+  border: 3px dashed var(--teal); color: var(--teal-ink); background: transparent;
+}
+.k-tag { position: relative; }
+.k-tag .fill {
+  position: absolute; inset: -3px; border-radius: 10px; opacity: 0;
+  display: flex; align-items: center; justify-content: center; background: var(--teal-deep); color: #fff;
+}
+
+/* 手繪線條：路徑設 pathLength="1"，用 stroke-dashoffset 畫出來 */
+.k-ink { position: absolute; overflow: visible; pointer-events: none; }
+.k-ink path { fill: none; stroke: var(--coral); stroke-width: 9; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 1; }
+
+/* 印章 */
+.k-stamp {
+  position: absolute; padding: 10px 22px; border: 5px solid var(--coral); border-radius: 12px;
+  font: 500 52px/1 var(--zh); letter-spacing: 0.1em; color: var(--coral); background: rgba(251, 248, 243, 0.85);
+}
+
+/* 大數字 */
+.k-num { font: 800 180px/1 var(--latin); color: var(--coral); letter-spacing: -0.02em; }
+
+.ch { opacity: 0; }
+
+  </style>
+  <div id="root" data-composition-id="s2-equation" data-width="1080" data-height="1920">
+  <div id="e-top" class="k-title" style="top:300px"><span class="s">下 Prompt</span></div>
+  <div id="e-eq" class="abs latin" style="left:0;right:0;top:500px;text-align:center;font:500 120px/1 var(--latin);color:var(--teal-ink)">=</div>
+  <div id="e-bottom" class="k-title" style="top:660px"><span class="s"><em>交代新人</em></span></div>
+  <span id="e-slot0" class="k-tag" style="position:absolute;top:960px;left:104px;width:200px;height:96px;font-size:40px"><span class="lbl">角色</span><span class="fill">角色</span></span><span id="e-slot1" class="k-tag" style="position:absolute;top:960px;left:328px;width:200px;height:96px;font-size:40px"><span class="lbl">背景</span><span class="fill">背景</span></span><span id="e-slot2" class="k-tag" style="position:absolute;top:960px;left:552px;width:200px;height:96px;font-size:40px"><span class="lbl">任務</span><span class="fill">任務</span></span><span id="e-slot3" class="k-tag" style="position:absolute;top:960px;left:776px;width:200px;height:96px;font-size:40px"><span class="lbl">格式</span><span class="fill">格式</span></span>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#e-top", { clipPath: "inset(100% 0% 0% 0%)", y: 28 }, { clipPath: "inset(0% 0% 0% 0%)", y: 0, duration: 0.5, ease: "power3.out" }, 0.618);
+    tl.fromTo("#e-eq", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2.2)" }, 2.55);
+    tl.fromTo("#e-bottom", { clipPath: "inset(100% 0% 0% 0%)", y: 28 }, { clipPath: "inset(0% 0% 0% 0%)", y: 0, duration: 0.5, ease: "power3.out" }, 2.918);
+    tl.fromTo("#e-slot0", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2.2)" }, 7.522);
+    tl.fromTo("#e-slot1", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2.2)" }, 7.642);
+    tl.fromTo("#e-slot2", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2.2)" }, 7.762);
+    tl.fromTo("#e-slot3", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2.2)" }, 7.882);
+    tl.set({}, {}, 8.9);
+    window.__timelines["s2-equation"] = tl;
+  </script>
+</template>

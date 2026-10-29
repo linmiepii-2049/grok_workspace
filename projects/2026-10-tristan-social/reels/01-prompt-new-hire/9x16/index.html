@@ -1,0 +1,178 @@
+<!doctype html>
+<!-- build.mjs 產生，不要手改：改 ../episode.json 或 reels/kit/ 後重跑 node reels/kit/build.mjs 01-prompt-new-hire -->
+<html lang="zh-Hant" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      @font-face { font-family: "Noto Sans TC"; src: url("assets/fonts/NotoSansTC-200.woff2") format("woff2"); font-weight: 200; }
+      @font-face { font-family: "Noto Sans TC"; src: url("assets/fonts/NotoSansTC-300.woff2") format("woff2"); font-weight: 300; }
+      @font-face { font-family: "Noto Sans TC"; src: url("assets/fonts/NotoSansTC-400.woff2") format("woff2"); font-weight: 400; }
+      @font-face { font-family: "Noto Sans TC"; src: url("assets/fonts/NotoSansTC-500.woff2") format("woff2"); font-weight: 500; }
+/* Tristan Reels 品牌層：配色、字型、共用元件樣式。每個場景都會內嵌一份 */
+:root {
+  --bg: #f5efe7;
+  --ink: #3a3836;
+  --muted: #8e8780;
+  --teal: #6e9e9b;
+  /* 灰綠原色在米白底上對比不足：文字用 teal-ink，白字底色用 teal-deep */
+  --teal-ink: #557f7c;
+  --teal-deep: #5b8986;
+  --coral: #d2483a;
+  --apricot: #edb27a;
+  --card: #fbf8f3;
+  --zh: "Noto Sans TC", sans-serif;
+  --latin: "Montserrat", "Noto Sans TC", sans-serif;
+}
+#root { position: absolute; inset: 0; font-family: var(--zh); color: var(--ink); line-break: strict; }
+em { font-style: normal; color: var(--coral); }
+.abs { position: absolute; }
+.latin { font-family: var(--latin); }
+
+/* 卡片：輸入框、回覆卡共用 */
+.k-card {
+  position: absolute; left: 80px; right: 80px;
+  background: var(--card); border: 1.5px solid rgba(58, 56, 54, 0.14); border-radius: 28px;
+  box-shadow: 0 12px 32px rgba(58, 56, 54, 0.1);
+  padding: 34px 40px;
+}
+.k-head { display: flex; align-items: center; gap: 18px; margin-bottom: 18px; }
+.k-who {
+  width: 56px; height: 56px; border-radius: 50%; flex: none;
+  display: flex; align-items: center; justify-content: center;
+  font: 500 28px/1 var(--latin); color: #fff; background: var(--teal-deep);
+}
+.k-who.ai { background: var(--apricot); color: var(--ink); }
+.k-who-name { font: 500 30px/1 var(--zh); color: var(--muted); letter-spacing: 0.06em; }
+.k-prompt-text { font: 400 50px/1.45 var(--zh); letter-spacing: 0.02em; }
+.k-reply-body { font: 300 38px/1.6 var(--zh); letter-spacing: 0.02em; white-space: pre-line; }
+
+/* 大標：思源黑體 Thin 拉長 1.18 倍。GSAP 只動外層，拉長放在內層 */
+.k-title { position: absolute; left: 60px; right: 60px; text-align: center; }
+.k-title .s {
+  display: inline-block; transform: scaleY(1.18); transform-origin: 50% 0;
+  font: 200 124px/1.12 var(--zh); letter-spacing: 0.04em; white-space: pre-line;
+}
+.k-title em { font-weight: 300; }
+
+/* 標籤與空槽：方角，不用膠囊形 */
+.k-tag {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 132px; height: 64px; padding: 0 16px; border-radius: 10px;
+  font: 500 32px/1 var(--zh); letter-spacing: 0.08em;
+  border: 3px dashed var(--teal); color: var(--teal-ink); background: transparent;
+}
+.k-tag { position: relative; }
+.k-tag .fill {
+  position: absolute; inset: -3px; border-radius: 10px; opacity: 0;
+  display: flex; align-items: center; justify-content: center; background: var(--teal-deep); color: #fff;
+}
+
+/* 手繪線條：路徑設 pathLength="1"，用 stroke-dashoffset 畫出來 */
+.k-ink { position: absolute; overflow: visible; pointer-events: none; }
+.k-ink path { fill: none; stroke: var(--coral); stroke-width: 9; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 1; }
+
+/* 印章 */
+.k-stamp {
+  position: absolute; padding: 10px 22px; border: 5px solid var(--coral); border-radius: 12px;
+  font: 500 52px/1 var(--zh); letter-spacing: 0.1em; color: var(--coral); background: rgba(251, 248, 243, 0.85);
+}
+
+/* 大數字 */
+.k-num { font: 800 180px/1 var(--latin); color: var(--coral); letter-spacing: -0.02em; }
+
+.ch { opacity: 0; }
+
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--bg); }
+      #root { overflow: hidden; background: var(--bg); }
+      #bg { position: absolute; inset: 0; }
+      .deco { position: absolute; }
+      #deco-stripes { left: -60px; bottom: 120px; width: 360px; height: 120px; color: var(--apricot); background: repeating-linear-gradient(135deg, currentColor 0 14px, transparent 14px 34px); opacity: 0.55; }
+      #deco-dots { right: 60px; bottom: 90px; width: 264px; height: 176px; color: var(--teal); background-image: radial-gradient(circle, currentColor 6px, transparent 7px); background-size: 44px 44px; opacity: 0.35; }
+      #badge { position: absolute; left: 80px; top: 176px; display: flex; align-items: center; gap: 18px; }
+      #badge .em { width: 64px; height: 64px; border-radius: 50%; background: var(--teal-deep); color: #fff; display: flex; align-items: center; justify-content: center; font: 500 34px/1 var(--zh); }
+      #badge .t { font: 800 28px/1 var(--latin); letter-spacing: 0.2em; color: var(--teal-ink); }
+      #captions { position: absolute; left: 0; right: 0; top: 1180px; height: 140px; }
+      .caption { position: absolute; left: 60px; right: 60px; top: 0; display: flex; justify-content: center; }
+      .caption span { background: var(--ink); color: var(--card); font: 500 44px/1.35 var(--zh); letter-spacing: 0.03em; padding: 12px 28px; border-radius: 14px; text-align: center; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="48" data-width="1080" data-height="1920">
+      <div id="bg" data-layout-ignore>
+        <div id="deco-stripes" class="deco"></div>
+        <div id="deco-dots" class="deco"></div>
+      </div>
+      <div id="badge"><span class="em">招</span><span class="t">AI HACKS #01</span></div>
+      <div id="s1-hook-canned" data-composition-id="s1-hook-canned" data-composition-src="compositions/s1-hook-canned.html" data-start="0" data-duration="8.25" data-track-index="1" data-track-kind="graphics" data-width="1080" data-height="1920"></div>
+      <div id="s2-equation" data-composition-id="s2-equation" data-composition-src="compositions/s2-equation.html" data-start="8.25" data-duration="8.9" data-track-index="2" data-track-kind="graphics" data-width="1080" data-height="1920"></div>
+      <div id="s3-prompt-build" data-composition-id="s3-prompt-build" data-composition-src="compositions/s3-prompt-build.html" data-start="17.15" data-duration="14.6" data-track-index="3" data-track-kind="graphics" data-width="1080" data-height="1920"></div>
+      <div id="s4-before-after" data-composition-id="s4-before-after" data-composition-src="compositions/s4-before-after.html" data-start="31.75" data-duration="3.45" data-track-index="4" data-track-kind="graphics" data-width="1080" data-height="1920"></div>
+      <div id="s5-pick-edit" data-composition-id="s5-pick-edit" data-composition-src="compositions/s5-pick-edit.html" data-start="35.2" data-duration="5.05" data-track-index="5" data-track-kind="graphics" data-width="1080" data-height="1920"></div>
+      <div id="s6-end-card" data-composition-id="s6-end-card" data-composition-src="compositions/s6-end-card.html" data-start="40.25" data-duration="7.75" data-track-index="6" data-track-kind="graphics" data-width="1080" data-height="1920"></div>
+      <!-- 旁白還沒產生：時間軸是估算的 -->
+      <audio id="sfx-1" class="clip" src="assets/sfx/typing.mp3" data-start="0.2" data-duration="1" data-volume="0.25"></audio>
+      <audio id="sfx-2" class="clip" src="assets/sfx/impact-bass-2.mp3" data-start="3.61" data-volume="0.35"></audio>
+      <audio id="sfx-3" class="clip" src="assets/sfx/whoosh-short.mp3" data-start="4.7" data-volume="0.3"></audio>
+      <audio id="sfx-4" class="clip" src="assets/sfx/click-soft.mp3" data-start="10.8" data-volume="0.3"></audio>
+      <audio id="sfx-5" class="clip" src="assets/sfx/pop.mp3" data-start="15.772" data-volume="0.18"></audio>
+      <audio id="sfx-6" class="clip" src="assets/sfx/pop.mp3" data-start="15.892" data-volume="0.18"></audio>
+      <audio id="sfx-7" class="clip" src="assets/sfx/pop.mp3" data-start="16.012" data-volume="0.18"></audio>
+      <audio id="sfx-8" class="clip" src="assets/sfx/pop.mp3" data-start="16.132" data-volume="0.18"></audio>
+      <audio id="sfx-9" class="clip" src="assets/sfx/pop.mp3" data-start="17.6" data-volume="0.25"></audio>
+      <audio id="sfx-10" class="clip" src="assets/sfx/typing.mp3" data-start="18.792" data-duration="1.358" data-volume="0.15"></audio>
+      <audio id="sfx-11" class="clip" src="assets/sfx/click-soft.mp3" data-start="20.45" data-volume="0.25"></audio>
+      <audio id="sfx-12" class="clip" src="assets/sfx/pop.mp3" data-start="20.65" data-volume="0.25"></audio>
+      <audio id="sfx-13" class="clip" src="assets/sfx/typing.mp3" data-start="21.817" data-duration="1.5" data-volume="0.15"></audio>
+      <audio id="sfx-14" class="clip" src="assets/sfx/click-soft.mp3" data-start="24.5" data-volume="0.25"></audio>
+      <audio id="sfx-15" class="clip" src="assets/sfx/pop.mp3" data-start="24.7" data-volume="0.25"></audio>
+      <audio id="sfx-16" class="clip" src="assets/sfx/typing.mp3" data-start="25.875" data-duration="1.5" data-volume="0.15"></audio>
+      <audio id="sfx-17" class="clip" src="assets/sfx/click-soft.mp3" data-start="28.15" data-volume="0.25"></audio>
+      <audio id="sfx-18" class="clip" src="assets/sfx/pop.mp3" data-start="28.35" data-volume="0.25"></audio>
+      <audio id="sfx-19" class="clip" src="assets/sfx/typing.mp3" data-start="29.521" data-duration="1.5" data-volume="0.15"></audio>
+      <audio id="sfx-20" class="clip" src="assets/sfx/click-soft.mp3" data-start="32" data-volume="0.25"></audio>
+      <audio id="sfx-21" class="clip" src="assets/sfx/impact-bass-1.mp3" data-start="32.877" data-volume="0.3"></audio>
+      <audio id="sfx-22" class="clip" src="assets/sfx/impact-bass-1.mp3" data-start="35.01" data-volume="0.3"></audio>
+      <audio id="sfx-23" class="clip" src="assets/sfx/whoosh-short.mp3" data-start="36.285" data-volume="0.25"></audio>
+      <audio id="sfx-24" class="clip" src="assets/sfx/key-press.mp3" data-start="37.628" data-volume="0.3"></audio>
+      <audio id="sfx-25" class="clip" src="assets/sfx/chime.mp3" data-start="43" data-volume="0.3"></audio>
+      <div id="captions" data-track-kind="captions">
+        <div id="cap-h-01-1" class="clip caption" data-start="0.3" data-duration="2.31"><span>你叫 AI 寫請假信</span></div>
+        <div id="cap-h-01-2" class="clip caption" data-start="2.61" data-duration="1.89"><span>它給你這種罐頭信？</span></div>
+        <div id="cap-h-02-1" class="clip caption" data-start="4.75" data-duration="2.118"><span>問題通常不在 AI</span></div>
+        <div id="cap-h-02-2" class="clip caption" data-start="6.868" data-duration="1.482"><span>在你怎麼交代</span></div>
+        <div id="cap-t-01-1" class="clip caption" data-start="8.6" data-duration="2.3"><span>其實下 Prompt</span></div>
+        <div id="cap-t-01-2" class="clip caption" data-start="10.9" data-duration="2.3"><span>就跟交代新人做事一樣</span></div>
+        <div id="cap-t-02-1" class="clip caption" data-start="13.45" data-duration="1.267"><span>新人第一天</span></div>
+        <div id="cap-t-02-2" class="clip caption" data-start="14.717" data-duration="2.533"><span>你會先跟他講清楚四件事</span></div>
+        <div id="cap-b-01-1" class="clip caption" data-start="17.5" data-duration="0.646"><span>第一</span></div>
+        <div id="cap-b-01-2" class="clip caption" data-start="18.146" data-duration="0.646"><span>角色</span></div>
+        <div id="cap-b-01-3" class="clip caption" data-start="18.792" data-duration="1.508"><span>你是我的秘書</span></div>
+        <div id="cap-b-02-1" class="clip caption" data-start="20.55" data-duration="0.633"><span>第二</span></div>
+        <div id="cap-b-02-2" class="clip caption" data-start="21.183" data-duration="0.633"><span>背景</span></div>
+        <div id="cap-b-02-3" class="clip caption" data-start="21.817" data-duration="1.478"><span>週五家裡有事</span></div>
+        <div id="cap-b-02-4" class="clip caption" data-start="23.294" data-duration="1.056"><span>要請一天</span></div>
+        <div id="cap-b-03-1" class="clip caption" data-start="24.6" data-duration="0.637"><span>第三</span></div>
+        <div id="cap-b-03-2" class="clip caption" data-start="25.238" data-duration="0.637"><span>任務</span></div>
+        <div id="cap-b-03-3" class="clip caption" data-start="25.875" data-duration="2.125"><span>寫一封請假信給主管</span></div>
+        <div id="cap-b-04-1" class="clip caption" data-start="28.25" data-duration="0.635"><span>第四</span></div>
+        <div id="cap-b-04-2" class="clip caption" data-start="28.885" data-duration="0.635"><span>格式</span></div>
+        <div id="cap-b-04-3" class="clip caption" data-start="29.521" data-duration="1.059"><span>語氣客氣</span></div>
+        <div id="cap-b-04-4" class="clip caption" data-start="30.579" data-duration="1.271"><span>100字以內</span></div>
+        <div id="cap-p-01-1" class="clip caption" data-start="32.1" data-duration="1.493"><span>多寫30個字</span></div>
+        <div id="cap-p-01-2" class="clip caption" data-start="33.593" data-duration="1.707"><span>省下來回改三次</span></div>
+        <div id="cap-j-01-1" class="clip caption" data-start="35.55" data-duration="2.922"><span>不過最後挑哪一版、改哪一句</span></div>
+        <div id="cap-j-01-2" class="clip caption" data-start="38.472" data-duration="1.878"><span>還是要靠你的眼光</span></div>
+        <div id="cap-c-01-1" class="clip caption" data-start="40.6" data-duration="2.7"><span>想要30招直接複製的指令？</span></div>
+        <div id="cap-c-01-2" class="clip caption" data-start="43.3" data-duration="1.454"><span>留言「指令」</span></div>
+        <div id="cap-c-01-3" class="clip caption" data-start="44.754" data-duration="1.246"><span>我私訊送你</span></div>
+      </div>
+    </div>
+    <script>
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = gsap.timeline({ paused: true });
+    </script>
+  </body>
+</html>
