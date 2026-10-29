@@ -6,3 +6,4 @@
 - [Tristan 輪播規格](tristan-carousel-style.md) — 封面放代表照片、末頁放形象照、思源黑體 Thin 拉長、@tris.tan.2049
 - [Tristan 五個系列](tristan-series-definition.md) — 當紅星／看熱鬧／工具包／小妙招／亮眼秀；比喻是技巧不是系列
 - [Tristan Reels 預設](tristan-reels-defaults.md) — 元件化、MiniMax 語速 1.2、停頓 0.18 秒、不放音樂
+- [Tristan 形象照放小](tristan-photo-small.md) — 本人不上相，片尾形象照直徑 266px，不當主視覺
