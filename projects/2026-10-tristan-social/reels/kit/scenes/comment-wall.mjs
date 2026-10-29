@@ -15,7 +15,7 @@ export default ({ props, ctx }) => {
   </div>`,
     )
     .join("")}
-  ${props.peep ? peep("w-peep", props.peep, { left: 356, top: 600, h: 520 }) : ""}
+  ${props.peep ? peep("w-peep", props.peep, { left: "center", top: 600, h: 520 }) : ""}
   <div id="w-note" class="abs" style="left:220px;top:330px;width:640px;padding:30px 0;text-align:center;background:var(--teal-deep);color:#fff;font:500 52px/1 var(--zh);letter-spacing:.06em;box-shadow:0 16px 36px rgba(58,56,54,.18)">${esc(props.note)}</div>`;
 
   // 第 0 格就有大標，當封面

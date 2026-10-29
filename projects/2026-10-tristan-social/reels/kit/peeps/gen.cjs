@@ -9,11 +9,25 @@ const React = require("react");
 const { renderToStaticMarkup } = require("react-dom/server");
 const Peep = require("react-peeps").default;
 
+const { chromium } = require("playwright");
+
 const dir = __dirname;
 const list = JSON.parse(fs.readFileSync(path.join(dir, "peeps.json"), "utf8"));
-for (const [name, parts] of Object.entries(list)) {
-  // 線條用墨色、填色用卡片白，跟 beige-teal 一致
-  const svg = renderToStaticMarkup(React.createElement(Peep, { ...parts, strokeColor: "#3A3836", backgroundColor: "#FBF8F3" }));
-  fs.writeFileSync(path.join(dir, `${name}.svg`), svg.replace(/^<svg /, '<svg xmlns="http://www.w3.org/2000/svg" ') + "\n");
-  console.log(`${name}.svg`);
-}
+(async () => {
+  const browser = await chromium.launch();
+  const page = await browser.newPage();
+  for (const [name, parts] of Object.entries(list)) {
+    // 線條用墨色、填色用卡片白，跟 beige-teal 一致
+    const svg = renderToStaticMarkup(React.createElement(Peep, { ...parts, strokeColor: "#3A3836", backgroundColor: "#FBF8F3" }));
+    // 有些姿勢（例如 PointingUp 的手、Bun 的髮髻）畫到預設 viewBox 外面：改用實際內容的範圍，四周留 12
+    await page.setContent(svg);
+    const { x, y, width, height } = await page.evaluate(() => {
+      const b = document.querySelector("svg").getBBox();
+      return { x: b.x, y: b.y, width: b.width, height: b.height };
+    });
+    const vb = [x - 12, y - 12, width + 24, height + 24].map((v) => Math.round(v)).join(" ");
+    fs.writeFileSync(path.join(dir, `${name}.svg`), svg.replace(/^<svg viewBox="[^"]*"/, `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${vb}"`) + "\n");
+    console.log(`${name}.svg  viewBox ${vb}`);
+  }
+  await browser.close();
+})();

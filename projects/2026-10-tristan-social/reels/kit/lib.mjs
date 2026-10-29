@@ -69,10 +69,12 @@ export const ink = (id, box, d, style = "") => {
 export const tag = (id, label, style = "") =>
   `<span id="${id}" class="k-tag" style="${style}"><span class="lbl">${esc(label)}</span><span class="fill">${esc(label)}</span></span>`;
 
-// Open Peeps 人物（kit/peeps/<name>.svg，由 peeps/gen.cjs 產生）：inline SVG，box 是像素位置 { left, top, h }，寬度照比例
+// Open Peeps 人物（kit/peeps/<name>.svg，由 peeps/gen.cjs 產生）：inline SVG，box 是像素位置 { left, top, h }，寬度照 viewBox 比例；left 填 "center" 置中
 export const peep = (id, name, box, flip = false) => {
   const svg = readFileSync(new URL(`./peeps/${name}.svg`, import.meta.url), "utf8").trim();
-  const w = Math.round((box.h * 850) / 1200);
-  return `<div id="${id}" class="abs" data-layout-ignore style="left:${box.left}px;top:${box.top}px;width:${w}px;height:${box.h}px;transform-origin:50% 100%">
+  const [, , vw, vh] = svg.match(/viewBox="([^"]+)"/)[1].split(" ").map(Number);
+  const w = Math.round((box.h * vw) / vh);
+  const left = box.left === "center" ? Math.round((1080 - w) / 2) : box.left;
+  return `<div id="${id}" class="abs" data-layout-ignore style="left:${left}px;top:${box.top}px;width:${w}px;height:${box.h}px;transform-origin:50% 100%">
     <div style="width:100%;height:100%;${flip ? "transform:scaleX(-1)" : ""}">${svg.replace("<svg ", '<svg width="100%" height="100%" ')}</div></div>`;
 };

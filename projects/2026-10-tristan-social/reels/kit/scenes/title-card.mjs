@@ -10,7 +10,7 @@ export default ({ props, ctx }) => {
   <div id="tc-kicker" class="abs" style="left:0;right:0;top:${420 + y}px;text-align:center;font:500 46px/1 var(--zh);letter-spacing:.12em;color:var(--teal-ink)">${esc(props.kicker)}</div>
   <div id="tc-line" class="abs" style="left:500px;top:${500 + y}px;width:80px;height:4px;background:var(--apricot)"></div>
   <div id="tc-title" class="k-title" style="top:${580 + y}px"><span class="s">${em(props.title)}</span></div>
-  ${props.peep ? peep("tc-peep", props.peep, { left: 437, top: 850, h: 290 }) : ""}`;
+  ${props.peep ? peep("tc-peep", props.peep, { left: "center", top: 850, h: 290 }) : ""}`;
   const kt = ctx.at(l1, props.kickerAt) - 0.15;
   const tt = ctx.at(l2, props.titleAt) - 0.3;
   const js = [mv.wipeUp("#tc-kicker", kt, 0.45), mv.wipeRight("#tc-line", kt + 0.2, 0.35), mv.wipeUp("#tc-title", tt, 0.55)];
