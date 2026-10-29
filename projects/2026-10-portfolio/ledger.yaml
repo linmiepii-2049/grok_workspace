@@ -1,86 +1,53 @@
 # 投資帳本：每天的資產、損益、績效都從這份檔案重新計算
 # 改完推上 main，網頁幾分鐘內就會更新；格式說明見 README.md
-#
-# ⚠ 下面是範例數字，請換成你自己的再推上去
 
 opening_date: 2026-10-29 # 起始日：從這天開始記錄資產曲線
 
 # ── 帳戶與現金 ────────────────────────────────
 # 每個帳戶一種幣別；cash 是起始日當天的現金餘額
-# 證券交割戶、銀行存款都列在這裡
+# TODO：現金餘額還沒填，帳戶名稱也可以改成券商名稱（要同步改下面的 account）
 accounts:
-  - name: 國泰證券
+  - name: 台股帳戶
     currency: TWD
-    cash: 350000
-  - name: Firstrade
+    cash: 0
+  - name: 美股帳戶
     currency: USD
-    cash: 2400
-  - name: 台新銀行
-    currency: TWD
-    cash: 500000
+    cash: 0
 
 # ── 起始部位（起始日以前就持有的）────────────
+# avg_cost 是原幣成本均價；美股沒填 cost_fx，成本用起始日匯率換算台幣
 opening_positions:
-  - symbol: 2330.TW # 台股上市加 .TW，上櫃加 .TWO
-    account: 國泰證券
-    shares: 1000
-    avg_cost: 620 # 每股平均成本，原幣、含手續費（券商 App 的「成本均價」）
-  - symbol: 0050.TW
-    account: 國泰證券
-    shares: 2000
-    avg_cost: 145.3
-  - symbol: NVDA # 美股直接寫代號
-    account: Firstrade
-    shares: 30
-    avg_cost: 118.5 # 美元
-    cost_fx: 31.2 # 買進時的平均匯率（1 美元兌台幣）；不填就用起始日匯率
+  # 台股（台幣）
+  - { symbol: 0050.TW, account: 台股帳戶, shares: 25900, avg_cost: 103.45 } # 元大台灣50
+  - { symbol: 006208.TW, account: 台股帳戶, shares: 5248, avg_cost: 154.71 } # 富邦台50
+  - { symbol: 00988A.TW, account: 台股帳戶, shares: 33000, avg_cost: 18.49 } # 主動統一全球創新
+  - { symbol: 2330.TW, account: 台股帳戶, shares: 947, avg_cost: 2396.00 } # 台積電
+  - { symbol: 3023.TW, account: 台股帳戶, shares: 6000, avg_cost: 285.86 } # 信邦
+  - { symbol: 3035.TW, account: 台股帳戶, shares: 5500, avg_cost: 178.95 } # 智原
+  - { symbol: 3661.TW, account: 台股帳戶, shares: 333, avg_cost: 3019.50 } # 世芯-KY
+  - { symbol: 6533.TW, account: 台股帳戶, shares: 1300, avg_cost: 282.46 } # 晶心科
+  - { symbol: 6531.TW, account: 台股帳戶, shares: 300, avg_cost: 829.00 } # 愛普
+
+  # 美股（美元）
+  - { symbol: AVGO, account: 美股帳戶, shares: 10.0128, avg_cost: 363.74 }
+  - { symbol: GOOGL, account: 美股帳戶, shares: 65.1088, avg_cost: 324.05 }
+  - { symbol: ISRG, account: 美股帳戶, shares: 3, avg_cost: 405.21 }
+  - { symbol: LLY, account: 美股帳戶, shares: 1.0011, avg_cost: 1191.07 }
+  - { symbol: MRVL, account: 美股帳戶, shares: 4.001, avg_cost: 258.20 }
+  - { symbol: MU, account: 美股帳戶, shares: 2, avg_cost: 858.83 }
+  - { symbol: NOW, account: 美股帳戶, shares: 12, avg_cost: 102.40 }
+  - { symbol: NVDA, account: 美股帳戶, shares: 6.0046, avg_cost: 199.75 }
+  - { symbol: NVO, account: 美股帳戶, shares: 24.2072, avg_cost: 49.20 }
+  - { symbol: SOFI, account: 美股帳戶, shares: 274, avg_cost: 20.77 }
+  - { symbol: VOO, account: 美股帳戶, shares: 60.273, avg_cost: 676.47 }
 
 # ── 交易紀錄（起始日之後，依時間往下加）──────
 # type 可以是：buy 買進、sell 賣出、dividend 現金股利、stock_dividend 配股、
 #             interest 利息、deposit 入金、withdraw 出金
-# 範例先註解掉，有交易時照格式取消註解或新增
-transactions:
-  # - date: 2026-11-03
-  #   type: buy
-  #   symbol: 2330.TW
-  #   account: 國泰證券
-  #   shares: 100
-  #   price: 1050
-  #   fee: 150 # 不填：台股用 0.1425%（最低 20 元）自動算，美股算 0
-
-  # - date: 2026-11-10
-  #   type: sell
-  #   symbol: NVDA
-  #   account: Firstrade
-  #   shares: 10
-  #   price: 205
-  #   fx: 32.1 # 成交日匯率；不填就用當天收盤匯率
-  #   # 台股證交稅自動算：股票 0.3%、ETF 0.1%；要自己填就寫 tax:
-
-  # - date: 2026-11-15
-  #   type: dividend
-  #   symbol: 0050.TW
-  #   account: 國泰證券
-  #   amount: 5000 # 入帳前的股利總額
-  #   tax: 0 # 被扣掉的稅、補充保費；美股預扣 30% 填在這裡
-
-  # - date: 2026-11-20
-  #   type: stock_dividend # 配股：股數增加、總成本不變
-  #   symbol: 2330.TW
-  #   account: 國泰證券
-  #   shares: 20
-
-  # - date: 2026-11-30
-  #   type: interest
-  #   account: 台新銀行
-  #   amount: 320
-
-  # - date: 2026-12-01
-  #   type: deposit # 從外部轉進來的錢，計算報酬率時會排除
-  #   account: 國泰證券
-  #   amount: 50000
-
-  # - date: 2026-12-05
-  #   type: withdraw # 轉出去的錢
-  #   account: Firstrade
-  #   amount: 500 # 帳戶幣別（這裡是美元）
+# 範例：
+#   - { date: 2026-11-03, type: buy, symbol: 2330.TW, account: 台股帳戶, shares: 100, price: 2400 }
+#   - { date: 2026-11-10, type: sell, symbol: NVDA, account: 美股帳戶, shares: 2, price: 220 }
+#   - { date: 2026-11-15, type: dividend, symbol: 0050.TW, account: 台股帳戶, amount: 5000 }
+#   - { date: 2026-12-01, type: deposit, account: 台股帳戶, amount: 50000 }
+# 欄位說明見 README.md
+transactions: []
