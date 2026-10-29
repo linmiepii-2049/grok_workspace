@@ -2,9 +2,10 @@ name: tts
 
 # 雲端 session 不持有 ElevenLabs 密鑰：推上 voiceover.json 後，這裡用 GitHub Secrets 產生旁白，commit 回同一個分支
 # tts.mjs 會跳過內容沒變的行，重跑不會重複計費
+# 路徑：單支影片 projects/<專案>/video/voiceover.json；系列影片 projects/<專案>/reels/<集>/voiceover.json
 on:
   push:
-    paths: ["projects/*/video/voiceover.json"]
+    paths: ["projects/**/voiceover.json"]
   workflow_dispatch:
     inputs:
       voiceover:
@@ -41,7 +42,7 @@ jobs:
           if [ -n "$INPUT" ]; then
             files="$INPUT"
           else
-            files="$(git diff --name-only HEAD~1 HEAD -- 'projects/*/video/voiceover.json' || true)"
+            files="$(git diff --name-only HEAD~1 HEAD -- 'projects/**/voiceover.json' || true)"
           fi
           echo "list<<EOF" >> "$GITHUB_OUTPUT"
           echo "$files" >> "$GITHUB_OUTPUT"
