@@ -1,0 +1,26 @@
+{
+  "id": "editorial-beige",
+  "name": "雜誌米杏",
+  "size": [1080, 1350],
+  "colors": {
+    "bg": "#EDE6DC",
+    "ink": "#2B2622",
+    "muted": "#6E655C",
+    "caramel": "#D9A26C",
+    "rust": "#B0763D",
+    "mustard": "#EFC94C",
+    "tan": "#E0D3C2",
+    "pale": "#F4EFE8",
+    "card": "#FBF8F3",
+    "line": "#B08850"
+  },
+  "fonts": {
+    "css": "https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,600;1,700&family=Noto+Serif+TC:wght@400;500;700;900&family=Great+Vibes&display=block",
+    "title": "'Playfair Display', 'Noto Serif TC'",
+    "titleWeight": 500,
+    "titleStretch": 1,
+    "body": "'Noto Serif TC'",
+    "latin": "'Playfair Display'",
+    "script": "'Great Vibes'"
+  }
+}

@@ -11,7 +11,7 @@ type: feedback
 - 標題字型用思源黑體 Thin（weight 200）縱向拉長 1.18 倍；不用找「文青木瓜」原字
 - IG 帳號：@tris.tan.2049
 - 版型（整套風格）放 `carousel/themes/<id>/`，使用者會給參考圖讓我做新版型；每套做完跑 `node preview.mjs <id>` 輸出預覽到 `outputs/templates/<id>.png`，使用者在 jteam-viewer 看 id 後指定發文用哪套
-- 已有版型：`beige-teal`（文青米白）、`collage-navy`（藍調拼貼：灰藍／藏青／米色紙輪流、撕紙邊、原子筆塗鴉、白色小花、襯線標題壓色塊；照片仍用彩色）
+- 已有版型：`beige-teal`（文青米白）、`collage-navy`（藍調拼貼：灰藍／藏青／米色紙輪流、撕紙邊、原子筆塗鴉、白色小花、襯線標題壓色塊；照片仍用彩色）、`editorial-beige`（雜誌米杏：米杏底、Playfair／思源宋體、焦糖色圓點、手寫體點綴、金細線頁尾）
 - 配色參考使用者給的 Canva 模板：米白底，搭配灰綠、磚紅、杏橘
 
 **Why:** 使用者看過試做稿後指定的。
