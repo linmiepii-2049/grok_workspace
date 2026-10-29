@@ -10,6 +10,7 @@ type: feedback
 - 最後一頁（CTA）放 Tristan 的形象照：彩色、灰綠背景那張（`carousel/assets/tristan.jpg`），和主色灰綠最搭
 - 標題字型用思源黑體 Thin（weight 200）縱向拉長 1.18 倍；不用找「文青木瓜」原字
 - IG 帳號：@tris.tan.2049
+- 版型（整套風格）放 `carousel/themes/<id>/`，使用者會給參考圖讓我做新版型；每套做完跑 `node preview.mjs <id>` 輸出預覽到 `outputs/templates/<id>.png`，使用者在 jteam-viewer 看 id 後指定發文用哪套
 - 配色參考使用者給的 Canva 模板：米白底，搭配灰綠、磚紅、杏橘
 
 **Why:** 使用者看過試做稿後指定的。

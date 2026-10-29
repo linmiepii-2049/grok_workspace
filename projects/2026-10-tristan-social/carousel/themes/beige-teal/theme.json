@@ -1,4 +1,5 @@
 {
+  "id": "beige-teal",
   "name": "文青米白",
   "size": [1080, 1350],
   "colors": {
@@ -17,8 +18,5 @@
     "titleStretch": 1.18,
     "body": "'Noto Sans TC'",
     "latin": "'Montserrat'"
-  },
-  "author": "Tristan",
-  "handle": "@tris.tan.2049",
-  "avatar": "assets/tristan.jpg"
+  }
 }
