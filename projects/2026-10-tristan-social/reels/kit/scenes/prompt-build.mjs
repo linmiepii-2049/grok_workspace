@@ -1,5 +1,6 @@
 // Prompt 一段一段長出來：每講一段，空槽變實心、那段文字打進輸入框，下方回覆卡改寫一版
-// props: rows: [{ tag, text, line, at }]（at：旁白裡開始念這段內容的詞）, replies: [v0, v1, ...]（每版是字串，\n 換行）
+// props: rows: [{ tag, text, line, at, tagAt?, until? }]（at：旁白裡開始念這段內容的詞；兩段在同一句旁白時，用 tagAt 指定標籤亮起的詞、until 指定這段打完並改寫回覆的詞）
+//        replies: [v0, v1, ...]（每版是字串，\n 換行）
 import { chars, esc, mv, tag } from "../lib.mjs";
 
 export default ({ props, ctx }) => {
@@ -31,17 +32,18 @@ export default ({ props, ctx }) => {
   props.rows.forEach((r, i) => {
     const start = ctx.t(r.line);
     const typeAt = ctx.at(r.line, r.at);
-    const typeEnd = ctx.end(r.line) - 0.15;
-    js.push(mv.fillTag(`#b-tag${i}`, start + 0.1));
+    const typeEnd = (r.until ? ctx.at(r.line, r.until) - 0.35 : ctx.end(r.line)) - 0.15;
+    const tagT = r.tagAt ? ctx.at(r.line, r.tagAt) - 0.3 : start + 0.1;
+    js.push(mv.fillTag(`#b-tag${i}`, tagT));
     js.push(mv.type(`#b-text${i}`, typeAt, Math.max(0.4, typeEnd - typeAt)));
     // 回覆改寫：舊版退場、新版由左往右刷出來，版本號換掉
-    const swap = ctx.end(r.line) + 0.05;
+    const swap = typeEnd + 0.2;
     js.push(mv.out(`#b-r${i}`, swap, 0.15));
     js.push(mv.wipeRight(`#b-r${i + 1}`, swap + 0.1, 0.5));
     js.push(mv.show(`#b-r${i + 1}`, swap + 0.1));
     js.push(mv.out(`#b-v${i}`, swap, 0.1));
     js.push(mv.pop(`#b-v${i + 1}`, swap + 0.1, 0.3));
-    ctx.sfx("pop", start + 0.1, 0.25);
+    ctx.sfx("pop", tagT, 0.25);
     ctx.sfx("typing", typeAt, 0.15, Math.max(0.4, typeEnd - typeAt));
     ctx.sfx("click-soft", swap + 0.1, 0.25);
   });

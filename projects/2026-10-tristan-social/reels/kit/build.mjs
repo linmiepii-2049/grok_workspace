@@ -4,7 +4,7 @@
 // 旁白改了：重跑 tts → vo-timeline → 這支腳本，所有動畫時間自動跟著旁白走，不用手改。
 // 用法：node reels/kit/build.mjs reels/<集> [--fonts]
 import { execFileSync } from "node:child_process";
-import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { copyFileSync, cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { esc } from "./lib.mjs";
@@ -26,8 +26,12 @@ const profile = read(join(KIT, "../../carousel/profile.json"));
 const brandCss = readFileSync(join(KIT, "brand.css"), "utf8");
 
 // ---- HyperFrames 專案 ----
+// tts workflow 會先建好 9x16/assets/audio，init 不接受非空資料夾：先 init 到暫存資料夾再搬過來，不覆蓋旁白
 if (!existsSync(join(OUT, "hyperframes.json"))) {
-  execFileSync("npx", ["hyperframes", "init", OUT, "--non-interactive", "--skip-skills", "--resolution", "portrait", "-e", "blank"], { cwd: REPO, stdio: "inherit" });
+  const tmp = `${OUT}.init`;
+  execFileSync("npx", ["hyperframes", "init", tmp, "--non-interactive", "--skip-skills", "--resolution", "portrait", "-e", "blank"], { cwd: REPO, stdio: "inherit" });
+  cpSync(tmp, OUT, { recursive: true, force: false });
+  rmSync(tmp, { recursive: true });
 }
 for (const d of ["compositions", "assets/sfx", "assets/img", "assets/fonts"]) mkdirSync(join(OUT, d), { recursive: true });
 

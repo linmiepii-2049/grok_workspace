@@ -1,0 +1,66 @@
+{
+  "series": {
+    "emblem": "招",
+    "en": "AI HACKS",
+    "no": "04"
+  },
+  "captionReplace": {
+    "三個": " 3 個",
+    "三十": "30"
+  },
+  "scenes": [
+    {
+      "type": "comment-wall",
+      "lines": ["h-01", "h-02", "a-01"],
+      "title": "你想交給 AI\n**哪件事**？",
+      "comments": [
+        { "name": "小美", "text": "寫週報", "line": "h-02", "at": "寫週報" },
+        { "name": "阿哲", "text": "整理 Excel", "line": "h-02", "at": "整理" },
+        { "name": "Vivian", "text": "回客訴信", "line": "h-02", "at": "回客訴" },
+        { "name": "大雄", "text": "做簡報", "line": "h-02", "at": "做簡報" },
+        { "name": "佳佳", "text": "會議記錄", "line": "h-02", "at": "還是" },
+        { "name": "Kevin", "text": "回主管的信", "line": "h-02", "at": "簡報" }
+      ],
+      "note": "挑 3 個 → 做成影片",
+      "noteLine": "a-01",
+      "noteAt": "我挑"
+    },
+    {
+      "type": "title-card",
+      "lines": ["t-01", "t-02"],
+      "kicker": "先送你一招",
+      "kickerAt": "先送",
+      "title": "不知道怎麼問\n叫 AI **先問你**",
+      "titleAt": "不知道"
+    },
+    {
+      "type": "prompt-build",
+      "rows": [
+        { "tag": "任務", "text": "幫我規劃部門尾牙。", "line": "t-03", "at": "幫我", "until": "開始前" },
+        { "tag": "先問我", "text": "開始前，先問我 3 個問題。", "line": "t-03", "at": "開始前", "tagAt": "開始前" }
+      ],
+      "replies": [
+        "（等你輸入⋯）",
+        "部門尾牙企劃：\n時間 12 月中旬，地點餐廳包廂，\n活動有抽獎、表演⋯⋯",
+        "開始前想先確認：\n1. 預算多少？　2. 幾個人參加？\n3. 想要什麼氣氛？"
+      ]
+    },
+    {
+      "type": "sort-split",
+      "line": "j-01",
+      "left": { "head": "交給 AI", "at": "交給它", "items": ["整理 Excel", "會議記錄", "寫週報"] },
+      "right": { "head": "留給**你**", "at": "留給自己", "items": ["簡報主軸", "跟客戶談條件"] },
+      "title": "**你**來判斷",
+      "lead": 0.1,
+      "titleAt": "是你的判斷"
+    },
+    {
+      "type": "end-card",
+      "line": "c-01",
+      "title": "留言「**指令**」",
+      "titleAt": "留言",
+      "sub": "送你《上班族 AI 指令包 30 招》",
+      "subAt": "我私訊"
+    }
+  ]
+}

@@ -1,0 +1,187 @@
+{
+  "total": 33.322,
+  "maxChars": 14,
+  "lines": [
+    {
+      "id": "h-01",
+      "text": "如果 AI 只能幫你做一件事，你最想丟給它什麼？",
+      "file": "assets/audio/vo/h-01.mp3",
+      "start": 0.3,
+      "duration": 3.527,
+      "captions": [
+        {
+          "text": "如果 AI 只能幫你做一件事",
+          "start": 0.336,
+          "end": 1.971
+        },
+        {
+          "text": "你最想丟給它什麼？",
+          "start": 1.971,
+          "end": 3.827
+        }
+      ]
+    },
+    {
+      "id": "h-02",
+      "text": "寫週報、整理 Excel、回客訴信，還是做簡報？",
+      "file": "assets/audio/vo/h-02.mp3",
+      "start": 4.007,
+      "duration": 3.474,
+      "captions": [
+        {
+          "text": "寫週報　整理 Excel",
+          "start": 4.043,
+          "end": 5.358
+        },
+        {
+          "text": "回客訴信　還是做簡報？",
+          "start": 5.358,
+          "end": 7.481
+        }
+      ]
+    },
+    {
+      "id": "a-01",
+      "text": "留言告訴我，我挑三個，做成影片教你。",
+      "file": "assets/audio/vo/a-01.mp3",
+      "start": 7.661,
+      "duration": 3.396,
+      "captions": [
+        {
+          "text": "留言告訴我　我挑三個",
+          "start": 7.697,
+          "end": 9.403
+        },
+        {
+          "text": "做成影片教你",
+          "start": 9.403,
+          "end": 11.057
+        }
+      ]
+    },
+    {
+      "id": "t-01",
+      "text": "在那之前，先送你一招萬用的。",
+      "file": "assets/audio/vo/t-01.mp3",
+      "start": 11.237,
+      "duration": 2.325,
+      "captions": [
+        {
+          "text": "在那之前　先送你一招萬用的",
+          "start": 11.273,
+          "end": 13.562
+        }
+      ]
+    },
+    {
+      "id": "t-02",
+      "text": "不知道怎麼問，就叫 AI 先問你。",
+      "file": "assets/audio/vo/t-02.mp3",
+      "start": 13.742,
+      "duration": 2.273,
+      "captions": [
+        {
+          "text": "不知道怎麼問",
+          "start": 13.778,
+          "end": 14.418
+        },
+        {
+          "text": "就叫 AI 先問你",
+          "start": 14.418,
+          "end": 16.015
+        }
+      ]
+    },
+    {
+      "id": "t-03",
+      "text": "像這樣：幫我規劃部門尾牙，開始前，先問我三個問題。",
+      "file": "assets/audio/vo/t-03.mp3",
+      "start": 16.195,
+      "duration": 4.049,
+      "captions": [
+        {
+          "text": "像這樣　幫我規劃部門尾牙",
+          "start": 16.231,
+          "end": 17.902
+        },
+        {
+          "text": "開始前　先問我三個問題",
+          "start": 17.902,
+          "end": 20.244
+        }
+      ]
+    },
+    {
+      "id": "r-01",
+      "text": "它問的，常常就是你自己還沒想清楚的地方。",
+      "file": "assets/audio/vo/r-01.mp3",
+      "start": 20.424,
+      "duration": 2.978,
+      "captions": [
+        {
+          "text": "它問的",
+          "start": 20.46,
+          "end": 20.744
+        },
+        {
+          "text": "常常就是你自己還沒想清楚的地",
+          "start": 20.744,
+          "end": 22.842
+        },
+        {
+          "text": "方",
+          "start": 22.842,
+          "end": 23.402
+        }
+      ]
+    },
+    {
+      "id": "j-01",
+      "text": "AI 能做的事很多，但哪件交給它、哪件留給自己，是你的判斷。",
+      "file": "assets/audio/vo/j-01.mp3",
+      "start": 23.582,
+      "duration": 4.545,
+      "captions": [
+        {
+          "text": "AI 能做的事很多",
+          "start": 23.618,
+          "end": 24.613
+        },
+        {
+          "text": "但哪件交給它　哪件留給自己",
+          "start": 24.613,
+          "end": 26.853
+        },
+        {
+          "text": "是你的判斷",
+          "start": 26.853,
+          "end": 28.127
+        }
+      ]
+    },
+    {
+      "id": "c-01",
+      "text": "留言「指令」，加上你最想交給 AI 的事，我私訊送你三十招指令包。",
+      "file": "assets/audio/vo/c-01.mp3",
+      "start": 28.307,
+      "duration": 4.415,
+      "captions": [
+        {
+          "text": "留言「指令」",
+          "start": 28.343,
+          "end": 28.983
+        },
+        {
+          "text": "加上你最想交給 AI 的事",
+          "start": 28.983,
+          "end": 30.511
+        },
+        {
+          "text": "我私訊送你三十招指令包",
+          "start": 30.511,
+          "end": 32.722
+        }
+      ]
+    }
+  ]
+}

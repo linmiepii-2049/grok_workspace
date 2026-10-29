@@ -38,10 +38,13 @@
 | -------------- | ------------------------------------------ | ------------------------------------------- |
 | `hook-canned`  | 鉤子：太短的 Prompt 換來罐頭回覆，蓋章劃掉 | prompt、reply、stamp、title                 |
 | `equation`     | 比喻等式 A ＝ B，下面排出空標籤槽          | top、bottom、slots                          |
-| `prompt-build` | Prompt 逐段長出來，回覆卡一版一版改寫      | rows（tag、text、line、at）、replies        |
+| `prompt-build` | Prompt 逐段長出來，回覆卡一版一版改寫      | rows（tag、text、line、at；同句兩段用 tagAt、until）、replies |
 | `before-after` | 前後對比加大數字                           | before、after、stats（pre、num、post、at）  |
 | `pick-edit`    | 人的判斷：圈選一版、改一句，接大標         | a、b（`[[要改的句子]]`）、fix、title        |
 | `end-card`     | 片尾 CTA：形象照、帳號、留言關鍵字         | title、sub                                  |
+| `comment-wall` | 互動鉤子：大標問題、留言彈進來、便利貼承諾 | title、comments（name、text、line、at）、note |
+| `title-card`   | 轉場大標：小字引言＋大標                   | kicker、title                               |
+| `sort-split`   | 人的判斷：卡片分成左右兩欄                 | left、right（head、at、items）、title       |
 
 - 時間欄位都寫成「旁白裡的某個詞」（例如 `"titleAt": "問題"`），build.mjs 換算成秒數；換聲音、改稿都不用手改時間
 - `**重點**` 會變成磚紅強調色；每個畫面只用一處
