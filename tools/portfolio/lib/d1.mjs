@@ -22,6 +22,20 @@ export const insert = (table, row, { conflict = "" } = {}) => {
   return `INSERT ${conflict} INTO ${table} (${cols.join(", ")}) VALUES (${cols.map((c) => sql(row[c])).join(", ")});`;
 };
 
+const wrangler = (local) => ({
+  bin: existsSync(join(ROOT, "node_modules/.bin/wrangler")) ? join(ROOT, "node_modules/.bin/wrangler") : "wrangler",
+  config: join(ROOT, local ? "apps/viewer/wrangler.jsonc" : "infra/wrangler.jsonc"),
+});
+
+// 唯讀查詢，回傳資料列
+export function query(statement, { local = false } = {}) {
+  const { bin, config } = wrangler(local);
+  const out = execFileSync(bin, ["d1", "execute", "jteam", local ? "--local" : "--remote", "--json", "--command", statement, "-c", config], {
+    cwd: ROOT, encoding: "utf8", stdio: ["ignore", "pipe", "inherit"],
+  });
+  return JSON.parse(out)[0]?.results ?? [];
+}
+
 export function execute(statements, { local = false, dryRun = false } = {}) {
   if (!statements.length) return;
   if (dryRun) {
@@ -31,8 +45,7 @@ export function execute(statements, { local = false, dryRun = false } = {}) {
   const dir = mkdtempSync(join(tmpdir(), "jt-portfolio-"));
   const file = join(dir, "write.sql");
   writeFileSync(file, statements.join("\n") + "\n");
-  const bin = existsSync(join(ROOT, "node_modules/.bin/wrangler")) ? join(ROOT, "node_modules/.bin/wrangler") : "wrangler";
-  const config = join(ROOT, local ? "apps/viewer/wrangler.jsonc" : "infra/wrangler.jsonc");
+  const { bin, config } = wrangler(local);
   try {
     execFileSync(bin, ["d1", "execute", "jteam", local ? "--local" : "--remote", "--yes", "--file", file, "-c", config], {
       cwd: ROOT, stdio: ["ignore", "ignore", "inherit"],

@@ -1,0 +1,29 @@
+name: deploy-cron
+
+on:
+  push:
+    branches: [main]
+    paths: ["apps/cron/**", ".github/workflows/deploy-cron.yml"]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-cron
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: 部署 jteam-cron
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: npm run cron:deploy

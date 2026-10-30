@@ -11,6 +11,7 @@
     "viewer:dev": "wrangler dev -c apps/viewer/wrangler.jsonc --port 8788",
     "viewer:deploy": "wrangler deploy -c apps/viewer/wrangler.jsonc",
     "viewer:seed": "node apps/viewer/seed.mjs",
+    "cron:deploy": "wrangler deploy -c apps/cron/wrangler.jsonc",
     "portfolio": "node tools/portfolio/run.mjs",
     "test:portfolio": "node --test tools/portfolio/ledger.test.mjs"
   },
