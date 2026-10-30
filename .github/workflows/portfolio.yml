@@ -2,10 +2,12 @@ name: portfolio
 
 # 投資追蹤（tools/portfolio）：重算資產快照、抓行事曆與新聞、產生晨報，寫進 D1
 # 晨報 md 由這裡 commit 回 main；GITHUB_TOKEN 的 push 不會觸發 archive.yml，所以在這裡直接歸檔
+# GitHub cron 常延遲數小時，apps/cron 的 Worker 會在同一時間用 workflow_dispatch 準時觸發；這裡的 cron 留作備援
+# 兩邊都跑時，晨報已存在就跳過，其他任務重跑結果相同
 on:
   schedule:
-    - cron: "0 8 * * 1-5" # 台北週一～五 16:00：台股收盤、FinMind 更新後，只重算快照
-    - cron: "0 22 * * 1-5" # 台北週二～六 06:00：美股收盤後，快照＋行事曆＋晨報
+    - cron: "59 12 * * 1-5" # 台北週一～五 20:59：台股收盤、FinMind 更新後，只重算快照
+    - cron: "59 21 * * 1-5" # 台北週二～六 05:59：美股收盤後，快照＋行事曆＋晨報
   push:
     branches: [main]
     paths: ["projects/2026-10-portfolio/ledger.yaml", "tools/portfolio/**"]
@@ -47,7 +49,7 @@ jobs:
           INPUT: ${{ inputs.tasks }}
         run: |
           if [ -n "$INPUT" ]; then t="$INPUT"
-          elif [ "$SCHEDULE" = "0 22 * * 1-5" ]; then t="snapshot events brief"
+          elif [ "$SCHEDULE" = "59 21 * * 1-5" ]; then t="snapshot events brief"
           else t="snapshot"; fi
           echo "list=$t" >> "$GITHUB_OUTPUT"
 

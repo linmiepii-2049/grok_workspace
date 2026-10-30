@@ -3,12 +3,13 @@
 //   snapshot  從 ledger.yaml 重算起始日至今每天的資產、損益、TWR，取代 D1 裡的舊資料
 //   events    抓未來 60 天的財報、除息、總經公布日
 //   brief     抓新聞、請 Claude 寫晨報，寫進 D1 與 outputs/briefs/<日期>.md（會先跑 snapshot）
+//             今天已經有晨報就不重寫（Worker 與 GitHub cron 都會觸發），--force 強制重寫
 //   不論指定哪個，都會先跑 snapshot（其他任務需要最新持股）
-//   --local   寫進 jteam-viewer 的本機 D1；--dry-run 只印出 SQL；--ledger=<路徑> 改用其他帳本（測試用）
+//   --local   寫進 jteam-viewer 的本機 D1；--dry-run 只印出 SQL；--force 重寫今天的晨報；--ledger=<路徑> 改用其他帳本（測試用）
 // 金鑰（環境變數，缺少時跳過該來源）：FINNHUB_API_KEY、FRED_API_KEY、ANTHROPIC_API_KEY；FINMIND_TOKEN 選填
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { execute, insert } from "./lib/d1.mjs";
+import { execute, insert, query } from "./lib/d1.mjs";
 import { computeSnapshots, isTW, LedgerError, loadLedger, symbolsOf } from "./lib/ledger.mjs";
 import * as src from "./lib/sources.mjs";
 
@@ -23,7 +24,7 @@ const flags = new Set(args.filter((a) => a.startsWith("--")));
 const ledgerPath = args.find((a) => a.startsWith("--ledger="))?.slice(9) ?? join(PROJECT, "ledger.yaml");
 const tasks = new Set(args.filter((a) => !a.startsWith("--")));
 if (!tasks.size || [...tasks].some((t) => !["snapshot", "events", "brief"].includes(t))) {
-  console.error("用法：node tools/portfolio/run.mjs <snapshot|events|brief>... [--local] [--dry-run]");
+  console.error("用法：node tools/portfolio/run.mjs <snapshot|events|brief>... [--local] [--dry-run] [--force]");
   process.exit(1);
 }
 const opts = { local: flags.has("--local"), dryRun: flags.has("--dry-run") };
@@ -162,6 +163,10 @@ async function brief(ctx, upcoming) {
 
   if (!process.env.ANTHROPIC_API_KEY) {
     warn("沒有 ANTHROPIC_API_KEY，跳過晨報");
+    return;
+  }
+  if (!flags.has("--force") && !opts.dryRun && query(`SELECT 1 FROM pf_briefs WHERE date = '${today}'`, opts).length) {
+    console.log(`✔ brief：${today} 已經有晨報，不重寫（--force 強制重寫）`);
     return;
   }
   const { writeBrief } = await import("./lib/brief.mjs");
