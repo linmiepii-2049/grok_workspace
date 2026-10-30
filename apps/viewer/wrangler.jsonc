@@ -6,6 +6,8 @@
   "compatibility_date": "2026-10-01",
   "account_id": "090a04034814d8905c2a759afa46d73e",
   "workers_dev": true,
+  // 自訂網域（emvyax.com 在同一個 Cloudflare 帳號）；Access 應用程式要把這個網域也加進去
+  "routes": [{ "pattern": "jteam.emvyax.com", "custom_domain": true }],
   // 預覽網址不在 Access 保護範圍內，關掉
   "preview_urls": false,
   "observability": { "enabled": true },

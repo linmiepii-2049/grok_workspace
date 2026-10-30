@@ -69,7 +69,7 @@ npm run jt -- archive --dry-run
 
 ## 6. 成品瀏覽頁的 Cloudflare Access
 
-網址：<https://jteam-viewer.survey-api.workers.dev>
+網址：<https://jteam.emvyax.com>（備用：<https://jteam-viewer.survey-api.workers.dev>）
 
 Access 設好之前，瀏覽頁打得開，但所有成品和資料都會回 401，不會外洩。
 
@@ -84,6 +84,13 @@ Access 設好之前，瀏覽頁打得開，但所有成品和資料都會回 401
    - **Team domain**：`<team 名稱>.cloudflareaccess.com`
 
 Claude 會把它們填進 `apps/viewer/wrangler.jsonc` 再部署，瀏覽頁就會開始驗證登入。
+
+### 6.1 自訂網域 jteam.emvyax.com
+
+`wrangler.jsonc` 的 `routes` 會在部署時自動建立 DNS 與憑證。部署後到 Zero Trust → **Access** → **Applications** → 剛才那個 jteam-viewer 應用程式 → **Edit** → **Public hostnames**（或 Destinations）→ **Add**，加上 `jteam.emvyax.com`。
+
+- 要加在**同一個**應用程式，AUD 才會一樣，不用改 `ACCESS_AUD`
+- 沒加之前，自訂網域的頁面打得開，但 API 全部回 401，不會外洩
 
 ## 7. Google Drive（移到 Drive 功能）
 
@@ -104,7 +111,9 @@ Claude 會把它們填進 `apps/viewer/wrangler.jsonc` 再部署，瀏覽頁就�
    - `drive.file` 屬於非敏感範圍，發布不需要 Google 審查
 6. **用戶端** → **建立用戶端**
    - 應用程式類型：**網頁應用程式**；名稱：`jteam-viewer`
-   - 已授權的重新導向 URI：`https://jteam-viewer.survey-api.workers.dev/api/gdrive/callback`
+   - 已授權的重新導向 URI（兩個都加）：
+     - `https://jteam.emvyax.com/api/gdrive/callback`
+     - `https://jteam-viewer.survey-api.workers.dev/api/gdrive/callback`
    - 建立後複製 **用戶端 ID** 和 **用戶端密鑰**
 
 ### 7.2 把密鑰存進 Worker
